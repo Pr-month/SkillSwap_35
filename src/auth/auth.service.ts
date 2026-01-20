@@ -2,19 +2,28 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { LoginAuthDto } from './dto/login-auth.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { User } from '../users/entities/user.entity';
 
 @Injectable()
 export class AuthService {
-  login({ email, password }: LoginAuthDto) {
-    // временная логика, без БД
-    if (email === 'test@test.com' && password === '123456') {
-      return {
-        message: 'Login successful',
-        user: { email },
-      };
-    }
+  constructor(
+    @InjectRepository(User)
+    private usersRepository: Repository<User>,
+  ) {}
 
-    throw new UnauthorizedException('Invalid credentials');
+  async login({ email, password }: LoginAuthDto) {
+    // TODO: заменить проверку пароля на bcrypt
+    // TODO: добавить генерацию JWT при успешном входе
+    // TODO: возможно добавить refresh token и хранение сессий
+
+    const user = await this.usersRepository.findOneBy({ email });
+    
+    if (!user || user.password !== password) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+    return { message: 'Login successful', user: { email: user.email } };
   }
   
   create(createAuthDto: CreateAuthDto) {
