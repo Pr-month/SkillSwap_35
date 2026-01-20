@@ -1,20 +1,28 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
+    constructor(
+    @InjectRepository(User)
+    private usersRepository: Repository<User>, // <- вот это важно
+  ) {}
+
   create(createUserDto: CreateUserDto) {
     void createUserDto;
     return 'This action adds a new user';
   }
 
   findAll() {
-    return `This action returns all users`;
+    return this.usersRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(id: number) {
+    return this.usersRepository.findOneBy({ id });
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
@@ -24,5 +32,18 @@ export class UsersService {
 
   remove(id: number) {
     return `This action removes a #${id} user`;
+  }
+
+  async findCurrentUser() {
+    // TODO: заменить на получение пользователя из JWT/сессии
+    return this.usersRepository.findOneBy({ id: 1 }); // пока тестовый пользователь
+  }
+
+  async updateCurrentUser(updateUserDto: UpdateUserDto) {
+    // TODO: заменить на получение id из JWT
+    const user = await this.usersRepository.findOneBy({ id: 1 });
+    if (!user) return null;
+    Object.assign(user, updateUserDto);
+    return this.usersRepository.save(user);
   }
 }
