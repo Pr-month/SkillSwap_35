@@ -22,8 +22,20 @@
   "dependencies": {
     "@nestjs/common": "^11.0.1",
     "@nestjs/core": "^11.0.1",
+<<<<<<< Updated upstream
+=======
+    "@nestjs/jwt": "^11.0.2",
+>>>>>>> Stashed changes
     "@nestjs/mapped-types": "*",
     "@nestjs/platform-express": "^11.0.1",
+<<<<<<< Updated upstream
+=======
+    "@nestjs/typeorm": "^11.0.0",
+    "cookie-parser": "^1.4.7",
+    "passport": "^0.7.0",
+    "passport-jwt": "^4.0.1",
+    "pg": "^8.17.1",
+>>>>>>> Stashed changes
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1"
   },
