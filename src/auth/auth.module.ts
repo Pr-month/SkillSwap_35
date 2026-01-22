@@ -14,4 +14,4 @@ import { AccessTokenStrategy } from './strategies/access-token.strategy';
   controllers: [AuthController],
   providers: [AuthService, AccessTokenStrategy, RefreshTokenStrategy],
 })
-export class AuthModule {}
+export class AuthModule { }

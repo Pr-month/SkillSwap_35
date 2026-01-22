@@ -21,7 +21,7 @@ export class UsersService {
     return this.usersRepository.find();
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     return this.usersRepository.findOneBy({ id });
   }
 
@@ -36,12 +36,12 @@ export class UsersService {
 
   async findCurrentUser() {
     // TODO: заменить на получение пользователя из JWT/сессии
-    return this.usersRepository.findOneBy({ id: 1 }); // пока тестовый пользователь
+    return this.usersRepository.findOneBy({ id: "saasas" }); // пока тестовый пользователь
   }
 
   async updateCurrentUser(updateUserDto: UpdateUserDto) {
     // TODO: заменить на получение id из JWT
-    const user = await this.usersRepository.findOneBy({ id: 1 });
+    const user = await this.usersRepository.findOneBy({ id: "asasas" });
     if (!user) return null;
     Object.assign(user, updateUserDto);
     return this.usersRepository.save(user);
