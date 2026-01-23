@@ -2,8 +2,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Injectable } from '@nestjs/common';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { Request } from 'express';
-
-type TJwtPayload = { sub: string; email?: string; role?: string };
+import { TJwtPayload } from '../types/jwt-payload.type';
 
 function refreshCookieExtractor(req: Request): string | null {
   return req?.cookies?.refreshToken ?? null;

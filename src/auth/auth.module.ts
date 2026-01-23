@@ -7,10 +7,7 @@ import { RefreshTokenStrategy } from './strategies/refresh-token.strategy';
 import { AccessTokenStrategy } from './strategies/access-token.strategy';
 
 @Module({
-  imports: [
-    PassportModule,
-    JwtModule.register({ secret: process.env.JWT_SECRET ?? 'big_secret' }),
-  ],
+  imports: [PassportModule, JwtModule],
   controllers: [AuthController],
   providers: [AuthService, AccessTokenStrategy, RefreshTokenStrategy],
 })

@@ -3,6 +3,8 @@ import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { Response, Request } from 'express';
 import { JwtService } from '@nestjs/jwt';
+import { signAccessToken, signRefreshToken } from './utils/tokens';
+import { TJwtPayload } from './types/jwt-payload.type';
 
 @Injectable()
 export class AuthService {
@@ -16,31 +18,10 @@ export class AuthService {
   }
 
   refresh(req: Request, res: Response) {
-    const user = req.user as { sub: string; email?: string; role?: string };
+    const user = req.user as TJwtPayload;
 
-    const accessToken = this.jwtService.sign(
-      {
-        sub: user.sub,
-        email: user.email,
-        role: user.role,
-      },
-      { secret: process.env.JWT_SECRET ?? 'big_secret', expiresIn: '1h' },
-    );
-
-    const refreshToken = this.jwtService.sign(
-      {
-        sub: user.sub,
-        email: user.email,
-        role: user.role,
-      },
-      {
-        secret:
-          process.env.JWT_REFRESH_SECRET ??
-          process.env.JWT_SECRET ??
-          'big_secret',
-        expiresIn: '7d',
-      },
-    );
+    const accessToken = signAccessToken(this.jwtService, user);
+    const refreshToken = signRefreshToken(this.jwtService, user);
 
     res.cookie('accessToken', accessToken, { httpOnly: true });
     res.cookie('refreshToken', refreshToken, { httpOnly: true });

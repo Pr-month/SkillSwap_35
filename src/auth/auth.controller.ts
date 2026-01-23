@@ -20,7 +20,7 @@ import { RefreshTokenGuard } from './guards/refresh-token.guard';
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
-  
+
   @UseGuards(AccessTokenGuard)
   @Post('logout')
   logout(@Res({ passthrough: true }) res: Response, @Req() req: Request) {
