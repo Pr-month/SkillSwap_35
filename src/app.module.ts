@@ -22,7 +22,10 @@ import { dbConfig, TDBConfig } from './config/db.config';
     }),
     TypeOrmModule.forRootAsync({
       inject: [dbConfig.KEY],
-      useFactory: (dbConfig: TDBConfig) => dbConfig,
+      useFactory: (dbConfig: TDBConfig) => ({
+        ...dbConfig,
+        autoLoadEntities: true,
+      }),
     }),
     UsersModule,
     AuthModule,
