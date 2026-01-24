@@ -1,10 +1,12 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
 import * as cookieParser from 'cookie-parser';
+import { AppModule } from './app.module';
+import { appConfig, TAppConfig } from './config/app.config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.use(cookieParser());
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
@@ -14,8 +16,9 @@ async function bootstrap() {
       validationError: { target: false, value: false },
     }),
   );
-  app.use(cookieParser());
-  await app.listen(process.env.PORT ?? 3000);
+
+  const appConfigData = app.get<TAppConfig>(appConfig.KEY);
+  await app.listen(appConfigData.port);
 }
 
 void bootstrap();
