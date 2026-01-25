@@ -3,10 +3,12 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { Gender, UserRole } from '../enums/user.enums';
+import { Skill } from 'src/skills/entities/skill.entity';
 
 @Entity('users')
 export class User {
@@ -43,8 +45,10 @@ export class User {
   @Column({ type: 'text', nullable: true })
   avatar: string;
 
-  @Column({ type: 'text', array: true, default: [] })
-  skills: string[];
+  @OneToMany(() => Skill, (skill) => skill.owner, {
+    cascade: true,
+  })
+  skills: Skill[];
 
   @Column({ type: 'text', array: true, default: [] })
   wantToLearn: string[];
