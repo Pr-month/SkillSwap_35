@@ -18,6 +18,19 @@ export class AuthService {
   refresh(req: Request, res: Response) {
     const user = req.user as { sub: string; email?: string; role?: string };
 
+    const { accessToken, refreshToken } = this._generateTokens(user);
+
+    res.cookie('accessToken', accessToken, { httpOnly: true });
+    res.cookie('refreshToken', refreshToken, { httpOnly: true });
+
+    return { message: 'Tokens refresh' };
+  }
+
+  private _generateTokens(user: {
+    sub: string;
+    email?: string;
+    role?: string;
+  }) {
     const accessToken = this.jwtService.sign(
       {
         sub: user.sub,
@@ -42,9 +55,6 @@ export class AuthService {
       },
     );
 
-    res.cookie('accessToken', accessToken, { httpOnly: true });
-    res.cookie('refreshToken', refreshToken, { httpOnly: true });
-
-    return { message: 'Tokens refresh' };
+    return { accessToken, refreshToken };
   }
 }
