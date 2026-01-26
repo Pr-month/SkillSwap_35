@@ -2,7 +2,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Injectable } from '@nestjs/common';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { Request } from 'express';
-import { TJwtPayload } from '../types/jwt-payload.type';
+import { TJwtPayload } from '../types/auth.types';
 
 function refreshCookieExtractor(req: Request): string | null {
   return req?.cookies?.refreshToken ?? null;
