@@ -4,6 +4,7 @@ import * as cookieParser from 'cookie-parser';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
 import { MulterExceptionFilter } from './common/filters/multer-exception.filter';
+import { AllExceptionFilter } from './common/filters/all-exception.filter';
 import { AppModule } from './app.module';
 import { appConfig, TAppConfig } from './config/app.config';
 
@@ -20,7 +21,10 @@ async function bootstrap() {
   );
   app.use(cookieParser());
   app.useStaticAssets(join(__dirname, '..', 'public'));
-  app.useGlobalFilters(new MulterExceptionFilter());
+  app.useGlobalFilters(
+    new MulterExceptionFilter(),
+    new AllExceptionFilter(),
+  );
   const appConfigData = app.get<TAppConfig>(appConfig.KEY);
   await app.listen(appConfigData.port);
 }
