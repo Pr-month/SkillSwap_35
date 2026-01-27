@@ -22,11 +22,13 @@ import { RefreshTokenGuard } from './guards/refresh-token.guard';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
   @Post('login')
-  login(@Body() loginAuthDto: LoginAuthDto) {
-    return this.authService.login(loginAuthDto);
+  login(
+    @Body() dto: LoginAuthDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    return this.authService.login(dto, res);
   }
 
- 
   @UseGuards(AccessTokenGuard)
   @Post('logout')
   logout(@Res({ passthrough: true }) res: Response, @Req() req: Request) {

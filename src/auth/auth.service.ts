@@ -7,6 +7,7 @@ import { Repository } from 'typeorm';
 import { User } from '../users/entities/user.entity';
 import { Response, Request } from 'express';
 import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -16,17 +17,54 @@ export class AuthService {
     private usersRepository: Repository<User>,
   ) {}
 
-  async login({ email, password }: LoginAuthDto) {
-    // TODO: заменить проверку пароля на bcrypt
-    // TODO: добавить генерацию JWT при успешном входе
-    // TODO: возможно добавить refresh token и хранение сессий
+  async login({ email, password }: LoginAuthDto, res: Response) {
+    const user = await this.usersRepository.findOne({
+      where: { email },
+      select: ['id', 'email', 'password', 'role', 'refreshToken'], 
+    });
 
-    const user = await this.usersRepository.findOneBy({ email });
-    
-    if (!user || user.password !== password) {
+    if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }
-    return { message: 'Login successful', user: { email: user.email } };
+
+    // Проверка пароля через bcrypt
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    const payload = {
+      sub: user.id,
+      email: user.email,
+      role: user.role,
+    };
+
+    // Генерация access token
+    const accessToken = this.jwtService.sign(payload, {
+      secret: process.env.JWT_SECRET ?? 'big_secret',
+      expiresIn: '1h',
+    });
+
+    // Генерация refresh token
+    const refreshToken = this.jwtService.sign(payload, {
+      secret:
+        process.env.JWT_REFRESH_SECRET ??
+        process.env.JWT_SECRET ??
+        'big_secret',
+      expiresIn: '7d',
+    });
+
+    // Хешируем refresh token перед сохранением в БД
+    const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
+    user.refreshToken = hashedRefreshToken;
+    await this.usersRepository.save(user);
+
+    // Кладём токены в httpOnly cookies
+    res.cookie('accessToken', accessToken, { httpOnly: true });
+    res.cookie('refreshToken', refreshToken, { httpOnly: true });
+
+    return { message: 'Login successful' };
   }
   
   logout(_req: Request, res: Response) {
