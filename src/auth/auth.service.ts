@@ -7,6 +7,8 @@ import { Repository } from 'typeorm';
 import { User } from '../users/entities/user.entity';
 import { Response, Request } from 'express';
 import { JwtService } from '@nestjs/jwt';
+import type { StringValue } from 'ms';
+import { TAuthRequest, TJwtPayload } from './types/auth.types';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -67,15 +69,30 @@ export class AuthService {
     return { message: 'Login successful' };
   }
   
-  logout(_req: Request, res: Response) {
+  logout(_req: TAuthRequest, res: Response) {
     res.clearCookie('accessToken');
     res.clearCookie('refreshToken');
     // TODO: очистить refreshToken в БД позже
     return { message: 'Logged out' };
   }
 
-  refresh(req: Request, res: Response) {
-    const user = req.user as { sub: string; email?: string; role?: string };
+  private async signTokens(payload: TJwtPayload) {
+    const accessToken = await this.jwtService.signAsync(payload, {
+      secret: process.env.JWT_SECRET ?? 'big_secret',
+      expiresIn: (process.env.JWT_EXPIRES_IN ?? '1h') as StringValue,
+    });
+    const refreshToken = await this.jwtService.signAsync(payload, {
+      secret:
+        process.env.JWT_REFRESH_SECRET ??
+        process.env.JWT_SECRET ??
+        'big_secret',
+      expiresIn: (process.env.JWT_REFRESH_EXPIRES_IN ?? '7d') as StringValue,
+    });
+      return { accessToken, refreshToken };
+  }
+
+  async refresh(req: TAuthRequest, res: Response) {
+    const { accessToken, refreshToken } = await this.signTokens(req.user);
 
     const { accessToken, refreshToken } = this._generateTokens(user);
 
@@ -83,37 +100,5 @@ export class AuthService {
     res.cookie('refreshToken', refreshToken, { httpOnly: true });
 
     return { message: 'Tokens refresh' };
-  }
-
-  private _generateTokens(user: {
-    sub: string;
-    email?: string;
-    role?: string;
-  }) {
-    const accessToken = this.jwtService.sign(
-      {
-        sub: user.sub,
-        email: user.email,
-        role: user.role,
-      },
-      { secret: process.env.JWT_SECRET ?? 'big_secret', expiresIn: '1h' },
-    );
-
-    const refreshToken = this.jwtService.sign(
-      {
-        sub: user.sub,
-        email: user.email,
-        role: user.role,
-      },
-      {
-        secret:
-          process.env.JWT_REFRESH_SECRET ??
-          process.env.JWT_SECRET ??
-          'big_secret',
-        expiresIn: '7d',
-      },
-    );
-
-    return { accessToken, refreshToken };
   }
 }

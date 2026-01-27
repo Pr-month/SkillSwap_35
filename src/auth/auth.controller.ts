@@ -17,10 +17,12 @@ import { LoginAuthDto } from './dto/login-auth.dto';
 import { Response, Request } from 'express';
 import { AccessTokenGuard } from './guards/access-token.guard';
 import { RefreshTokenGuard } from './guards/refresh-token.guard';
+import { TAuthRequest } from './types/auth.types';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
+
   @Post('login')
   login(
     @Body() dto: LoginAuthDto,
@@ -31,13 +33,13 @@ export class AuthController {
 
   @UseGuards(AccessTokenGuard)
   @Post('logout')
-  logout(@Res({ passthrough: true }) res: Response, @Req() req: Request) {
+  logout(@Res({ passthrough: true }) res: Response, @Req() req: TAuthRequest) {
     return this.authService.logout(req, res);
   }
 
   @UseGuards(RefreshTokenGuard)
   @Post('refresh')
-  refresh(@Res({ passthrough: true }) res: Response, @Req() req: Request) {
+  refresh(@Res({ passthrough: true }) res: Response, @Req() req: TAuthRequest) {
     return this.authService.refresh(req, res);
   }
 }
