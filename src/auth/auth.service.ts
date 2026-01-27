@@ -94,8 +94,6 @@ export class AuthService {
   async refresh(req: TAuthRequest, res: Response) {
     const { accessToken, refreshToken } = await this.signTokens(req.user);
 
-    const { accessToken, refreshToken } = this._generateTokens(user);
-
     res.cookie('accessToken', accessToken, { httpOnly: true });
     res.cookie('refreshToken', refreshToken, { httpOnly: true });
 
