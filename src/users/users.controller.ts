@@ -6,10 +6,15 @@ import {
   Patch,
   Param,
   Delete,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
+import { Request } from 'express';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { AccessTokenGuard } from '../auth/guards/access-token.guard';
 
 @Controller('users')
 export class UsersController {
@@ -25,18 +30,35 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
+  @UseGuards(AccessTokenGuard)
+  @Patch('me/password')
+  changePassword(@Req() req: Request, @Body() dto: UpdateUserPasswordDto) {
+    const userId = (req.user as { sub: string }).sub;
+    return this.usersService.changePassword(userId, dto);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
+    return this.usersService.findOne(id);
+  }
+
+  @Get('me')
+  async getMe() {
+    return this.usersService.findCurrentUser();
+  }
+
+  @Patch('me')
+  async updateMe(@Body() updateUserDto: UpdateUserDto) {
+    return this.usersService.updateCurrentUser(updateUserDto);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+    return this.usersService.update(id, updateUserDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+    return this.usersService.remove(id);
   }
 }
