@@ -42,6 +42,16 @@ export class UsersController {
     return this.usersService.findOne(id);
   }
 
+  @Get('me')
+  async getMe() {
+    return this.usersService.findCurrentUser();
+  }
+
+  @Patch('me')
+  async updateMe(@Body() updateUserDto: UpdateUserDto) {
+    return this.usersService.updateCurrentUser(updateUserDto);
+  }
+
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(id, updateUserDto);

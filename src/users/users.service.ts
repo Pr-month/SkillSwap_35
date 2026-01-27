@@ -1,11 +1,11 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
+import { User } from './entities/user.entity';
+import * as bcrypt from 'bcrypt';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { User } from './entities/user.entity';
 
 @Injectable()
 export class UsersService {
@@ -20,11 +20,11 @@ export class UsersService {
   }
 
   findAll() {
-    return `This action returns all users`;
+    return this.usersRepository.find();
   }
 
-  findOne(id: string) {
-    return `This action returns a #${id} user`;
+  async findOne(id: string) {
+    return this.usersRepository.findOneBy({ id });
   }
 
   update(id: string, updateUserDto: UpdateUserDto) {
@@ -36,6 +36,18 @@ export class UsersService {
     return `This action removes a #${id} user`;
   }
 
+  async findCurrentUser() {
+    // TODO: заменить на получение пользователя из JWT/сессии
+    return this.usersRepository.findOneBy({ id: "saasas" }); // пока тестовый пользователь
+  }
+
+  async updateCurrentUser(updateUserDto: UpdateUserDto) {
+    // TODO: заменить на получение id из JWT
+    const user = await this.usersRepository.findOneBy({ id: "asasas" });
+    if (!user) return null;
+    Object.assign(user, updateUserDto);
+    return this.usersRepository.save(user);
+  }
   async changePassword(
     userId: string,
     dto: UpdateUserPasswordDto,
