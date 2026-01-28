@@ -36,26 +36,14 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const payload = {
+    const payload: TJwtPayload = {
       sub: user.id,
       email: user.email,
       role: user.role,
     };
 
     // Генерация access token
-    const accessToken = this.jwtService.sign(payload, {
-      secret: process.env.JWT_SECRET ?? 'big_secret',
-      expiresIn: '1h',
-    });
-
-    // Генерация refresh token
-    const refreshToken = this.jwtService.sign(payload, {
-      secret:
-        process.env.JWT_REFRESH_SECRET ??
-        process.env.JWT_SECRET ??
-        'big_secret',
-      expiresIn: '7d',
-    });
+    const { accessToken, refreshToken } = await this.signTokens(payload);
 
     // Хешируем refresh token перед сохранением в БД
     const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
