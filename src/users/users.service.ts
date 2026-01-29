@@ -6,12 +6,14 @@ import * as bcrypt from 'bcrypt';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly usersRepository: Repository<User>,
+    private readonly configService: ConfigService,
   ) {}
 
   create(createUserDto: CreateUserDto) {
@@ -61,7 +63,9 @@ export class UsersService {
       );
     }
 
-    const hashedPassword = await bcrypt.hash(dto.newPassword, 10);
+    // Получаем hashSalt через ConfigService
+    const hashSalt = this.configService.get<number>('APP_CONFIG.hashSalt', 10);
+    const hashedPassword = await bcrypt.hash(dto.newPassword, hashSalt);
     await this.usersRepository.update(userId, { password: hashedPassword });
 
     return { message: 'Password updated' };

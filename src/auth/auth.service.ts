@@ -10,6 +10,7 @@ import { JwtService } from '@nestjs/jwt';
 import type { StringValue } from 'ms';
 import { TAuthRequest, TJwtPayload } from './types/auth.types';
 import * as bcrypt from 'bcrypt';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
@@ -17,6 +18,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    private readonly configService: ConfigService,
   ) {}
 
   async login({ email, password }: LoginAuthDto, res: Response) {
@@ -57,8 +59,10 @@ export class AuthService {
       expiresIn: '7d',
     });
 
+    // Получаем hashSalt
+    const hashSalt = this.configService.get<number>('APP_CONFIG.hashSalt', 10);
     // Хешируем refresh token перед сохранением в БД
-    const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
+    const hashedRefreshToken = await bcrypt.hash(refreshToken, hashSalt);
     user.refreshToken = hashedRefreshToken;
     await this.usersRepository.save(user);
 
