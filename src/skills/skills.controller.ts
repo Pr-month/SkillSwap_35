@@ -1,7 +1,16 @@
-import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Query,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { AccessTokenGuard } from '../auth/guards/access-token.guard';
 import { TAuthRequest } from '../auth/types/auth.types';
 import { CreateSkillDto } from './dto/create-skill.dto';
+import { SkillQueryDto } from './dto/skill-query.dto';
 import { SkillsService } from './skills.service';
 
 @Controller('skills')
@@ -18,10 +27,10 @@ export class SkillsController {
     return await this.skillsService.create(createSkillDto, userId);
   }
 
-  // @Get()
-  // findAll() {
-  //   return this.skillsService.findAll();
-  // }
+  @Get()
+  async findAll(@Query() query: SkillQueryDto) {
+    return await this.skillsService.findAll(query);
+  }
 
   // @Get(':id')
   // findOne(@Param('id') id: string) {
