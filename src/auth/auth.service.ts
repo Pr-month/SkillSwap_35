@@ -10,6 +10,7 @@ import { JwtService } from '@nestjs/jwt';
 import type { StringValue } from 'ms';
 import { TAuthRequest, TJwtPayload } from './types/auth.types';
 import * as bcrypt from 'bcrypt';
+import { RegisterDto } from './dto/register.dto';
 
 @Injectable()
 export class AuthService {
@@ -17,12 +18,26 @@ export class AuthService {
     private readonly jwtService: JwtService,
     @InjectRepository(User)
     private usersRepository: Repository<User>,
-  ) {}
+  ) { }
+
+  async register(registerDto: RegisterDto) {
+    const hashedPassword = await bcrypt.hash(registerDto.password, 10);
+    const user = await this.usersRepository.create({ ...registerDto, password: hashedPassword })
+
+    const payload: TJwtPayload = {
+      sub: user.id,
+      email: user.email,
+      role: user.role
+    }
+    
+    const tokens = await this.signTokens(payload);
+    return { ...tokens };
+  }
 
   async login({ email, password }: LoginAuthDto, res: Response) {
     const user = await this.usersRepository.findOne({
       where: { email },
-      select: ['id', 'email', 'password', 'role', 'refreshToken'], 
+      select: ['id', 'email', 'password', 'role', 'refreshToken'],
     });
 
     if (!user) {
@@ -56,7 +71,7 @@ export class AuthService {
 
     return { message: 'Login successful' };
   }
-  
+
   logout(_req: TAuthRequest, res: Response) {
     res.clearCookie('accessToken');
     res.clearCookie('refreshToken');
@@ -76,7 +91,7 @@ export class AuthService {
         'big_secret',
       expiresIn: (process.env.JWT_REFRESH_EXPIRES_IN ?? '7d') as StringValue,
     });
-      return { accessToken, refreshToken };
+    return { accessToken, refreshToken };
   }
 
   async refresh(req: TAuthRequest, res: Response) {
