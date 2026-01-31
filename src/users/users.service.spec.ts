@@ -4,6 +4,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { UsersService } from './users.service';
 import { User } from './entities/user.entity';
+import { appConfig, TAppConfig } from '../config/app.config';
 
 describe('UsersService', () => {
   let service: UsersService;
@@ -11,6 +12,7 @@ describe('UsersService', () => {
     findOneByOrFail: jest.Mock;
     update: jest.Mock;
   };
+  let mockConfig: Partial<TAppConfig>;
 
   beforeEach(async () => {
     usersRepository = {
@@ -22,10 +24,14 @@ describe('UsersService', () => {
       providers: [
         UsersService,
         { provide: getRepositoryToken(User), useValue: usersRepository },
+        { provide: appConfig.KEY, useValue: mockConfig },
       ],
     }).compile();
 
     service = module.get<UsersService>(UsersService);
+    mockConfig = {
+      hashSalt: 10,
+    };
   });
 
   afterEach(() => {
