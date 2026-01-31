@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, Inject } from '@nestjs/common';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { LoginAuthDto } from './dto/login-auth.dto';
@@ -10,6 +10,7 @@ import { JwtService } from '@nestjs/jwt';
 import type { StringValue } from 'ms';
 import { TAuthRequest, TJwtPayload } from './types/auth.types';
 import * as bcrypt from 'bcrypt';
+import { appConfig, TAppConfig } from '../config/app.config';
 import { RegisterDto } from './dto/register.dto';
 
 @Injectable()
@@ -18,6 +19,8 @@ export class AuthService {
     private readonly jwtService: JwtService,
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    @Inject(appConfig.KEY)
+    private readonly config: TAppConfig,
   ) { }
 
   async register(registerDto: RegisterDto) {
@@ -61,7 +64,7 @@ export class AuthService {
     const { accessToken, refreshToken } = await this.signTokens(payload);
 
     // Хешируем refresh token перед сохранением в БД
-    const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
+    const hashedRefreshToken = await bcrypt.hash(refreshToken, this.config.hashSalt);
     user.refreshToken = hashedRefreshToken;
     await this.usersRepository.save(user);
 
