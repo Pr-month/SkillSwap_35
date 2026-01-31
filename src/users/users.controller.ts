@@ -15,10 +15,11 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AccessTokenGuard } from '../auth/guards/access-token.guard';
+import { TAuthRequest } from 'src/auth/types/auth.types';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) { }
 
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
@@ -32,9 +33,8 @@ export class UsersController {
 
   @UseGuards(AccessTokenGuard)
   @Patch('me/password')
-  changePassword(@Req() req: Request, @Body() dto: UpdateUserPasswordDto) {
-    const userId = (req.user as { sub: string }).sub;
-    return this.usersService.changePassword(userId, dto);
+  changePassword(@Req() req: TAuthRequest, @Body() dto: UpdateUserPasswordDto) {
+    return this.usersService.changePassword(req.user.sub, dto);
   }
 
   @Get(':id')

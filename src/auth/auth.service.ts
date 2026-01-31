@@ -11,6 +11,7 @@ import type { StringValue } from 'ms';
 import { TAuthRequest, TJwtPayload } from './types/auth.types';
 import * as bcrypt from 'bcrypt';
 import { appConfig, TAppConfig } from '../config/app.config';
+import { RegisterDto } from './dto/register.dto';
 
 @Injectable()
 export class AuthService {
@@ -20,12 +21,26 @@ export class AuthService {
     private usersRepository: Repository<User>,
     @Inject(appConfig.KEY)
     private readonly config: TAppConfig,
-  ) {}
+  ) { }
+
+  async register(registerDto: RegisterDto) {
+    const hashedPassword = await bcrypt.hash(registerDto.password, 10);
+    const user = await this.usersRepository.create({ ...registerDto, password: hashedPassword })
+
+    const payload: TJwtPayload = {
+      sub: user.id,
+      email: user.email,
+      role: user.role
+    }
+    
+    const tokens = await this.signTokens(payload);
+    return { ...tokens };
+  }
 
   async login({ email, password }: LoginAuthDto, res: Response) {
     const user = await this.usersRepository.findOne({
       where: { email },
-      select: ['id', 'email', 'password', 'role', 'refreshToken'], 
+      select: ['id', 'email', 'password', 'role', 'refreshToken'],
     });
 
     if (!user) {
@@ -39,26 +54,14 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const payload = {
+    const payload: TJwtPayload = {
       sub: user.id,
       email: user.email,
       role: user.role,
     };
 
     // Генерация access token
-    const accessToken = this.jwtService.sign(payload, {
-      secret: process.env.JWT_SECRET ?? 'big_secret',
-      expiresIn: '1h',
-    });
-
-    // Генерация refresh token
-    const refreshToken = this.jwtService.sign(payload, {
-      secret:
-        process.env.JWT_REFRESH_SECRET ??
-        process.env.JWT_SECRET ??
-        'big_secret',
-      expiresIn: '7d',
-    });
+    const { accessToken, refreshToken } = await this.signTokens(payload);
 
     // Хешируем refresh token перед сохранением в БД
     const hashedRefreshToken = await bcrypt.hash(refreshToken, this.config.hashSalt);
@@ -71,7 +74,7 @@ export class AuthService {
 
     return { message: 'Login successful' };
   }
-  
+
   logout(_req: TAuthRequest, res: Response) {
     res.clearCookie('accessToken');
     res.clearCookie('refreshToken');
@@ -91,7 +94,7 @@ export class AuthService {
         'big_secret',
       expiresIn: (process.env.JWT_REFRESH_EXPIRES_IN ?? '7d') as StringValue,
     });
-      return { accessToken, refreshToken };
+    return { accessToken, refreshToken };
   }
 
   async refresh(req: TAuthRequest, res: Response) {
