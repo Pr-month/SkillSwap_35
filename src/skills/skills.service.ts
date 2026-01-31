@@ -1,5 +1,6 @@
 import {
   ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -12,6 +13,8 @@ import { SkillPaginatedDto } from './dto/skill-paginated.dto';
 import { SkillQueryDto } from './dto/skill-query.dto';
 import { SkillDto } from './dto/skill.dto';
 import { Skill } from './entities/skill.entity';
+import { UpdateSkillDto } from './dto/update-skill.dto';
+import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class SkillsService {
@@ -19,7 +22,9 @@ export class SkillsService {
     @InjectRepository(Skill)
     private readonly skillsRepository: Repository<Skill>,
     private readonly usersService: UsersService,
-  ) {}
+    @InjectRepository(User)
+    private readonly usersRepository: Repository<User>
+  ) { }
 
   async create(
     createSkillDto: CreateSkillDto,
@@ -124,15 +129,83 @@ export class SkillsService {
     });
   }
 
-  // findOne(id: number) {
-  //   return `This action returns a #${id} skill`;
-  // }
+  async update(id: string, updateSkillDto: UpdateSkillDto, userId: string) {
+    const skill = await this.skillsRepository.findOne({
+      where: { id },
+      relations: ['owner'],
+    });
 
-  // update(id: number, updateSkillDto: UpdateSkillDto) {
-  //   return `This action updates a #${id} skill`;
-  // }
+    if (!skill) {
+      throw new NotFoundException('Skill not found');
+    }
 
-  // remove(id: number) {
-  //   return `This action removes a #${id} skill`;
-  // }
+    if (skill.owner.id !== userId) {
+      throw new ForbiddenException('Недостаточно прав для обновления этого навыка');
+    }
+
+    Object.assign(skill, updateSkillDto);
+
+    return this.skillsRepository.save(skill);
+  }
+
+  async remove(id: string, userId: string) {
+    const skill = await this.skillsRepository.findOne({
+      where: { id },
+      relations: ['owner'],
+    });
+
+    if (!skill) {
+      throw new NotFoundException('Skill not found');
+    }
+
+    if (skill.owner.id !== userId) {
+      throw new ForbiddenException('Недостаточно прав для удаления этого навыка');
+    }
+
+    await this.skillsRepository.remove(skill);
+
+    return { message: 'Skill deleted successfully' };
+  }
+
+  async addToFavorites(skillId: string, userId: string) {
+    const skill = await this.skillsRepository.findOne({ where: { id: skillId } });
+    if (!skill) {
+      throw new NotFoundException('Skill not found');
+    }
+
+    const user = await this.usersRepository.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    if (user.favoriteSkills.includes(skillId)) {
+      throw new ConflictException('Навык уже в избранном');
+    }
+
+    user.favoriteSkills.push(skillId);
+
+    await this.usersRepository.save(user);
+
+    return { message: 'Skill added to favorites' };
+  }
+
+  async removeFromFavorites(skillId: string, userId: string) {
+    const user = await this.usersRepository.findOne({ where: { id: userId } });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const index = user.favoriteSkills.indexOf(skillId);
+
+    if (index === -1) {
+      throw new NotFoundException('Навык не найден в избранном');
+    }
+
+    user.favoriteSkills.splice(index, 1);
+
+    await this.usersRepository.save(user);
+
+    return { message: 'Skill removed from favorites' };
+  }
 }

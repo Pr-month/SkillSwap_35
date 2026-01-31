@@ -1,7 +1,10 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  Param,
+  Patch,
   Post,
   Query,
   Req,
@@ -12,6 +15,7 @@ import { TAuthRequest } from '../auth/types/auth.types';
 import { CreateSkillDto } from './dto/create-skill.dto';
 import { SkillQueryDto } from './dto/skill-query.dto';
 import { SkillsService } from './skills.service';
+import { UpdateSkillDto } from './dto/update-skill.dto';
 
 @Controller('skills')
 export class SkillsController {
@@ -32,18 +36,45 @@ export class SkillsController {
     return await this.skillsService.findAll(query);
   }
 
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.skillsService.findOne(+id);
-  // }
 
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateSkillDto: UpdateSkillDto) {
-  //   return this.skillsService.update(+id, updateSkillDto);
-  // }
+  @Patch(':id')
+  @UseGuards(AccessTokenGuard)
+  update(
+    @Param('id') id: string,
+    @Body() updateSkillDto: UpdateSkillDto,
+    @Req() req: Request,
+  ) {
+    const userId = (req as any).user.id;
+    return this.skillsService.update(id, updateSkillDto, userId);
+  }
 
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.skillsService.remove(+id);
-  // }
+  @Delete(':id')
+  @UseGuards(AccessTokenGuard)
+  remove(
+    @Param('id') id: string,
+    @Req() req: Request,
+  ) {
+    const userId = (req as any).user.id;
+    return this.skillsService.remove(id, userId);
+  }
+
+  @Post(':id/favorite')
+  @UseGuards(AccessTokenGuard)
+  addToFavorites(
+    @Param('id') id: string,
+    @Req() req: Request,
+  ) {
+    const userId = (req as any).user.id;
+    return this.skillsService.addToFavorites(id, userId);
+  }
+
+  @Delete(':id/favorite')
+  @UseGuards(AccessTokenGuard)
+  removeFromFavorites(
+    @Param('id') id: string,
+    @Req() req: Request,
+  ) {
+    const userId = (req as any).user.id;
+    return this.skillsService.removeFromFavorites(id, userId);
+  }
 }
