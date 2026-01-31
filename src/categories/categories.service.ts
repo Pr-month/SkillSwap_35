@@ -64,13 +64,19 @@ export class CategoriesService {
   async remove(id: string) {
     const category = await this.categoryRepo.findOne({
       where: { id },
+      relations: ['children'],
     });
 
     if (!category) {
       throw new NotFoundException('Category not found');
     }
 
+    if (category.children?.length) {
+      await this.categoryRepo.remove(category.children);
+    }
+
     await this.categoryRepo.remove(category);
+
     return { message: 'Category deleted' };
   }
 }
