@@ -4,7 +4,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { UsersService } from './users.service';
 import { User } from './entities/user.entity';
-import { ConfigService } from '@nestjs/config';
+import { appConfig, TAppConfig } from '../config/app.config';
 
 describe('UsersService', () => {
   let service: UsersService;
@@ -12,9 +12,7 @@ describe('UsersService', () => {
     findOneByOrFail: jest.Mock;
     update: jest.Mock;
   };
-  let configService: {
-    get: jest.Mock;
-  };
+  let mockConfig: Partial<TAppConfig>;
 
   beforeEach(async () => {
     usersRepository = {
@@ -26,12 +24,14 @@ describe('UsersService', () => {
       providers: [
         UsersService,
         { provide: getRepositoryToken(User), useValue: usersRepository },
-        { provide: ConfigService, useValue: configService },
+        { provide: appConfig.KEY, useValue: mockConfig },
       ],
     }).compile();
 
     service = module.get<UsersService>(UsersService);
-    configService = module.get(ConfigService);
+    mockConfig = {
+      hashSalt: 10,
+    };
   });
 
   afterEach(() => {
@@ -49,12 +49,6 @@ describe('UsersService', () => {
       jest.spyOn(bcrypt, 'compare').mockImplementation(async () => true);
       jest.spyOn(bcrypt, 'hash').mockImplementation(async () => 'new-hash');
 
-      // Настраиваем мок ConfigService
-      configService.get.mockImplementation((key: string, defaultValue?: any) => {
-        if (key === 'APP_CONFIG.hashSalt') return 10;
-        return defaultValue;
-      });
-
       const result = await service.changePassword('user-id', {
         oldPassword: 'old-pass',
         newPassword: 'new-pass',
@@ -69,8 +63,6 @@ describe('UsersService', () => {
       expect(usersRepository.update).toHaveBeenCalledWith('user-id', {
         password: 'new-hash',
       });
-      // Проверяем, что ConfigService был вызван
-      expect(configService.get).toHaveBeenCalledWith('APP_CONFIG.hashSalt', 10);
     });
 
     it('throws UnauthorizedException when old password is invalid', async () => {
@@ -86,8 +78,6 @@ describe('UsersService', () => {
       ).rejects.toBeInstanceOf(UnauthorizedException);
 
       expect(usersRepository.update).not.toHaveBeenCalled();
-      // ConfigService.get не должен вызываться при неверном пароле
-      expect(configService.get).not.toHaveBeenCalled();
     });
   });
 });
