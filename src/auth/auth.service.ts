@@ -21,18 +21,21 @@ export class AuthService {
     private usersRepository: Repository<User>,
     @Inject(appConfig.KEY)
     private readonly config: TAppConfig,
-  ) { }
+  ) {}
 
   async register(registerDto: RegisterDto) {
     const hashedPassword = await bcrypt.hash(registerDto.password, 10);
-    const user = await this.usersRepository.create({ ...registerDto, password: hashedPassword })
+    const user = await this.usersRepository.create({
+      ...registerDto,
+      password: hashedPassword,
+    });
 
     const payload: TJwtPayload = {
       sub: user.id,
       email: user.email,
-      role: user.role
-    }
-    
+      role: user.role,
+    };
+
     const tokens = await this.signTokens(payload);
     return { ...tokens };
   }
@@ -64,7 +67,10 @@ export class AuthService {
     const { accessToken, refreshToken } = await this.signTokens(payload);
 
     // Хешируем refresh token перед сохранением в БД
-    const hashedRefreshToken = await bcrypt.hash(refreshToken, this.config.hashSalt);
+    const hashedRefreshToken = await bcrypt.hash(
+      refreshToken,
+      this.config.hashSalt,
+    );
     user.refreshToken = hashedRefreshToken;
     await this.usersRepository.save(user);
 

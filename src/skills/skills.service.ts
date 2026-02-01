@@ -23,8 +23,8 @@ export class SkillsService {
     private readonly skillsRepository: Repository<Skill>,
     private readonly usersService: UsersService,
     @InjectRepository(User)
-    private readonly usersRepository: Repository<User>
-  ) { }
+    private readonly usersRepository: Repository<User>,
+  ) {}
 
   async create(
     createSkillDto: CreateSkillDto,
@@ -140,7 +140,9 @@ export class SkillsService {
     }
 
     if (skill.owner.id !== userId) {
-      throw new ForbiddenException('Недостаточно прав для обновления этого навыка');
+      throw new ForbiddenException(
+        'Недостаточно прав для обновления этого навыка',
+      );
     }
 
     Object.assign(skill, updateSkillDto);
@@ -159,7 +161,9 @@ export class SkillsService {
     }
 
     if (skill.owner.id !== userId) {
-      throw new ForbiddenException('Недостаточно прав для удаления этого навыка');
+      throw new ForbiddenException(
+        'Недостаточно прав для удаления этого навыка',
+      );
     }
 
     await this.skillsRepository.remove(skill);
@@ -168,7 +172,9 @@ export class SkillsService {
   }
 
   async addToFavorites(skillId: string, userId: string) {
-    const skill = await this.skillsRepository.findOne({ where: { id: skillId } });
+    const skill = await this.skillsRepository.findOne({
+      where: { id: skillId },
+    });
     if (!skill) {
       throw new NotFoundException('Skill not found');
     }

@@ -1,4 +1,11 @@
-import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus, PayloadTooLargeException } from '@nestjs/common';
+import {
+  ArgumentsHost,
+  Catch,
+  ExceptionFilter,
+  HttpException,
+  HttpStatus,
+  PayloadTooLargeException,
+} from '@nestjs/common';
 import { Response } from 'express';
 import { EntityNotFoundError } from 'typeorm';
 
@@ -38,11 +45,11 @@ export class AllExceptionFilter implements ExceptionFilter {
       const status = exception.getStatus();
       const res = exception.getResponse();
 
-      return response.status(status).json(
-        typeof res === 'string'
-          ? { statusCode: status, message: res }
-          : res,
-      );
+      return response
+        .status(status)
+        .json(
+          typeof res === 'string' ? { statusCode: status, message: res } : res,
+        );
     }
 
     return response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
