@@ -1,4 +1,5 @@
-import { Expose } from 'class-transformer';
+import { Expose, Type } from 'class-transformer';
+import { SkillDto } from 'src/skills/dto/skill.dto';
 import { Gender, UserRole } from '../enums/user.enums';
 
 export class UserDto {
@@ -21,10 +22,14 @@ export class UserDto {
   city: string | null;
 
   @Expose()
-  gender: Gender | null;
+  gender: Gender;
 
   @Expose()
   avatar: string | null;
+
+  @Expose()
+  @Type(() => SkillDto)
+  skills: SkillDto[];
 
   @Expose()
   wantToLearn: string[];

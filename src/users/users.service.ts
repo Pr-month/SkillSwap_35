@@ -1,4 +1,4 @@
-﻿import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, Inject } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -8,12 +8,15 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserDto } from './dto/user.dto';
+import { appConfig, TAppConfig } from '../config/app.config';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly usersRepository: Repository<User>,
+    @Inject(appConfig.KEY)
+    private readonly config: TAppConfig,
   ) {}
 
   create(createUserDto: CreateUserDto) {
@@ -64,7 +67,7 @@ export class UsersService {
       throw new UnauthorizedException('Неправильный текущий пароль');
     }
 
-    const hashedPassword = await bcrypt.hash(dto.newPassword, 10);
+    const hashedPassword = await bcrypt.hash(dto.newPassword, this.config.hashSalt);
     await this.usersRepository.update(userId, { password: hashedPassword });
 
     return { message: 'Password updated' };
