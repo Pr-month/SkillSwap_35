@@ -4,6 +4,8 @@ import {
   CreateDateColumn,
   Entity,
   OneToMany,
+  ManyToMany,
+  JoinTable,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -50,11 +52,21 @@ export class User {
   })
   skills: Skill[];
 
-  @Column({ type: 'text', array: true, default: [] })
-  wantToLearn: string[];
+  @ManyToMany(() => Skill)
+  @JoinTable({
+    name: 'user_want_to_learn_skills',
+    joinColumn: { name: 'user_id' },
+    inverseJoinColumn: { name: 'skill_id' },
+  })
+  wantToLearn: Skill[];
 
-  @Column({ type: 'text', array: true, default: [] })
-  favoriteSkills: string[];
+  @ManyToMany(() => Skill)
+  @JoinTable({
+    name: 'user_favorite_skills',
+    joinColumn: { name: 'user_id' },
+    inverseJoinColumn: { name: 'skill_id' },
+  })
+  favoriteSkills: Skill[];
 
   @Column({
     type: 'enum',
