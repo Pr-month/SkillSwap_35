@@ -21,10 +21,7 @@ async function bootstrap() {
   );
   app.use(cookieParser());
   app.useStaticAssets(join(__dirname, '..', 'public'));
-  app.useGlobalFilters(
-    new MulterExceptionFilter(),
-    new AllExceptionFilter(),
-  );
+  app.useGlobalFilters(new MulterExceptionFilter(), new AllExceptionFilter());
   const appConfigData = app.get<TAppConfig>(appConfig.KEY);
   await app.listen(appConfigData.port);
 }

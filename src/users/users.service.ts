@@ -41,12 +41,12 @@ export class UsersService {
 
   async findCurrentUser() {
     // TODO: заменить на получение пользователя из JWT/сессии
-    return this.usersRepository.findOneBy({ id: "saasas" }); // пока тестовый пользователь
+    return this.usersRepository.findOneBy({ id: 'saasas' }); // пока тестовый пользователь
   }
 
   async updateCurrentUser(updateUserDto: UpdateUserDto) {
     // TODO: заменить на получение id из JWT
-    const user = await this.usersRepository.findOneBy({ id: "asasas" });
+    const user = await this.usersRepository.findOneBy({ id: 'asasas' });
     if (!user) return null;
     Object.assign(user, updateUserDto);
     return this.usersRepository.save(user);
@@ -59,12 +59,13 @@ export class UsersService {
     const isMatch = await bcrypt.compare(dto.oldPassword, user.password);
 
     if (!isMatch) {
-      throw new UnauthorizedException(
-        'Неправильный текущий пароль',
-      );
+      throw new UnauthorizedException('Неправильный текущий пароль');
     }
 
-    const hashedPassword = await bcrypt.hash(dto.newPassword, this.config.hashSalt);
+    const hashedPassword = await bcrypt.hash(
+      dto.newPassword,
+      this.config.hashSalt,
+    );
     await this.usersRepository.update(userId, { password: hashedPassword });
 
     return { message: 'Password updated' };
