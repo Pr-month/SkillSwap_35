@@ -1,4 +1,5 @@
 import { Injectable, UnauthorizedException, Inject } from '@nestjs/common';
+import { plainToInstance } from 'class-transformer';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
@@ -6,6 +7,7 @@ import * as bcrypt from 'bcrypt';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UserDto } from './dto/user.dto';
 import { appConfig, TAppConfig } from '../config/app.config';
 
 @Injectable()
@@ -39,18 +41,21 @@ export class UsersService {
     return `This action removes a #${id} user`;
   }
 
-  async findCurrentUser() {
-    // TODO: заменить на получение пользователя из JWT/сессии
-    return this.usersRepository.findOneBy({ id: 'saasas' }); // пока тестовый пользователь
+  async findCurrentUser(userId: string) {
+    const user = await this.usersRepository.findOneByOrFail({ id: userId });
+    return this.toUserDto(user);
   }
 
-  async updateCurrentUser(updateUserDto: UpdateUserDto) {
-    // TODO: заменить на получение id из JWT
-    const user = await this.usersRepository.findOneBy({ id: 'asasas' });
-    if (!user) return null;
-    Object.assign(user, updateUserDto);
-    return this.usersRepository.save(user);
+  async updateCurrentUser(userId: string, updateUserDto: UpdateUserDto) {
+    const user = await this.usersRepository.findOneByOrFail({ id: userId });
+    const updates = Object.fromEntries(
+      Object.entries(updateUserDto).filter(([, value]) => value !== undefined),
+    );
+    Object.assign(user, updates);
+    const savedUser = await this.usersRepository.save(user);
+    return this.toUserDto(savedUser);
   }
+
   async changePassword(
     userId: string,
     dto: UpdateUserPasswordDto,
@@ -69,5 +74,9 @@ export class UsersService {
     await this.usersRepository.update(userId, { password: hashedPassword });
 
     return { message: 'Password updated' };
+  }
+
+  private toUserDto(user: User): UserDto {
+    return plainToInstance(UserDto, user, { excludeExtraneousValues: true });
   }
 }

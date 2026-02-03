@@ -1,5 +1,5 @@
 import { Expose, Type } from 'class-transformer';
-import { SkillDto } from 'src/skills/dto/skill.dto';
+import { SkillDto } from '../../skills/dto/skill.dto';
 import { Gender, UserRole } from '../enums/user.enums';
 
 export class UserDto {

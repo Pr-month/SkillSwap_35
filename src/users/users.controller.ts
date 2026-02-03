@@ -9,13 +9,12 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { Request } from 'express';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AccessTokenGuard } from '../auth/guards/access-token.guard';
-import { TAuthRequest } from 'src/auth/types/auth.types';
+import { TAuthRequest } from '../auth/types/auth.types';
 
 @Controller('users')
 export class UsersController {
@@ -37,19 +36,24 @@ export class UsersController {
     return this.usersService.changePassword(req.user.sub, dto);
   }
 
+  @UseGuards(AccessTokenGuard)
+  @Get('me')
+  getMe(@Req() req: TAuthRequest) {
+    return this.usersService.findCurrentUser(req.user.sub);
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @Patch('me')
+  updateMe(
+    @Req() req: TAuthRequest,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
+    return this.usersService.updateCurrentUser(req.user.sub, updateUserDto);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.usersService.findOne(id);
-  }
-
-  @Get('me')
-  async getMe() {
-    return this.usersService.findCurrentUser();
-  }
-
-  @Patch('me')
-  async updateMe(@Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.updateCurrentUser(updateUserDto);
   }
 
   @Patch(':id')
