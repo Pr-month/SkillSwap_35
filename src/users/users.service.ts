@@ -67,7 +67,10 @@ export class UsersService {
       throw new UnauthorizedException('Неправильный текущий пароль');
     }
 
-    const hashedPassword = await bcrypt.hash(dto.newPassword, this.config.hashSalt);
+    const hashedPassword = await bcrypt.hash(
+      dto.newPassword,
+      this.config.hashSalt,
+    );
     await this.usersRepository.update(userId, { password: hashedPassword });
 
     return { message: 'Password updated' };
