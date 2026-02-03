@@ -1,41 +1,34 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { APP_GUARD } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { AuthModule } from './auth/auth.module';
-import { appConfig } from './config/app.config';
-import { dbConfig, TDBConfig } from './config/db.config';
-import { FilesModule } from './files/files.module';
-import { SkillsModule } from './skills/skills.module';
 import { UsersModule } from './users/users.module';
+import { AuthModule } from './auth/auth.module';
+import { RolesGuard } from './auth/guards/roles.guard';
+import { AccessTokenGuard } from './auth/guards/access-token.guard';
 
 @Module({
   imports: [
     JwtModule.register({
-      global: true, // ✅ JWT подключён глобально
+      global: true,
       secret: process.env.JWT_SECRET || 'jwt_secret',
       signOptions: { expiresIn: '1h' },
     }),
-    ConfigModule.forRoot({
-      isGlobal: true,
-      envFilePath: '.env.dev.example',
-      load: [appConfig, dbConfig],
-    }),
-    TypeOrmModule.forRootAsync({
-      inject: [dbConfig.KEY],
-      useFactory: (dbConfig: TDBConfig) => ({
-        ...dbConfig,
-        autoLoadEntities: true,
-      }),
-    }),
     UsersModule,
     AuthModule,
-    FilesModule,
-    SkillsModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: AccessTokenGuard, // проверка JWT глобально
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard, // проверка ролей глобально
+    },
+  ],
 })
 export class AppModule {}
