@@ -9,11 +9,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from '../users/entities/user.entity';
 
 @Module({
-  imports: [
-    PassportModule,
-    TypeOrmModule.forFeature([User]),
-  ],
+  imports: [PassportModule, TypeOrmModule.forFeature([User])],
   controllers: [AuthController],
   providers: [AuthService, AccessTokenStrategy, RefreshTokenStrategy],
 })
-export class AuthModule { }
+export class AuthModule {}

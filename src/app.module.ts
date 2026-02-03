@@ -1,14 +1,15 @@
 import { Module } from '@nestjs/common';
-import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { appConfig } from './config/app.config';
 import { dbConfig, TDBConfig } from './config/db.config';
 import { FilesModule } from './files/files.module';
+import { SkillsModule } from './skills/skills.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -32,8 +33,9 @@ import { FilesModule } from './files/files.module';
     UsersModule,
     AuthModule,
     FilesModule,
+    SkillsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}

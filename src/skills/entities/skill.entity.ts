@@ -22,7 +22,7 @@ export class Skill {
 
   @Column({
     type: 'text',
-    nullable: true,
+    nullable: false,
   })
   description: string;
 
@@ -34,7 +34,7 @@ export class Skill {
 
   @Column({
     type: 'json',
-    nullable: true,
+    nullable: false,
     default: [],
   })
   images: string[];
