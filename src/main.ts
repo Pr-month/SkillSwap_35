@@ -1,5 +1,5 @@
-import { ValidationPipe } from '@nestjs/common';
-import { NestFactory } from '@nestjs/core';
+import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
+import { NestFactory, Reflector } from '@nestjs/core';
 import * as cookieParser from 'cookie-parser';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
@@ -18,6 +18,9 @@ async function bootstrap() {
       transformOptions: { enableImplicitConversion: true },
       validationError: { target: false, value: false },
     }),
+  );
+  app.useGlobalInterceptors(
+    new ClassSerializerInterceptor(app.get(Reflector)),
   );
   app.use(cookieParser());
   app.useStaticAssets(join(__dirname, '..', 'public'));
