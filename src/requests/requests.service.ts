@@ -55,24 +55,23 @@ export class RequestsService {
     return this.requestsRepository.save(request);
   }
 
-  // ✅ ВХОДЯЩИЕ ЗАЯВКИ
   async findIncoming(userId: string) {
     return this.requestsRepository.find({
-      where: {
-        receiver: {
-          id: userId,
-        },
-      },
-      relations: [
-        'sender',
-        'receiver',
-        'requestedSkill',
-        'offeredSkill',
-      ],
+      where: { receiver: { id: userId } },
+      relations: ['sender', 'receiver', 'requestedSkill', 'offeredSkill'],
+      order: { createdAt: 'DESC' },
     });
   }
 
-  // ниже НЕ ТРОГАЕМ
+  async findOutgoing(userId: string) {
+    return this.requestsRepository.find({
+      where: { sender: { id: userId } },
+      relations: ['sender', 'receiver', 'requestedSkill', 'offeredSkill'],
+      order: { createdAt: 'DESC' },
+    });
+  }
+
+  // Сгенерированные методы (по умолчанию)
   findAll() {
     return `This action returns all requests`;
   }
