@@ -55,7 +55,24 @@ export class RequestsService {
     return this.requestsRepository.save(request);
   }
 
-  // остальное НЕ ТРОГАЕМ
+  // ✅ ВХОДЯЩИЕ ЗАЯВКИ
+  async findIncoming(userId: string) {
+    return this.requestsRepository.find({
+      where: {
+        receiver: {
+          id: userId,
+        },
+      },
+      relations: [
+        'sender',
+        'receiver',
+        'requestedSkill',
+        'offeredSkill',
+      ],
+    });
+  }
+
+  // ниже НЕ ТРОГАЕМ
   findAll() {
     return `This action returns all requests`;
   }

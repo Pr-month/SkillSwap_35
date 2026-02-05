@@ -19,7 +19,7 @@ import { TAuthRequest } from '../auth/types/auth.types';
 export class RequestsController {
   constructor(private readonly requestsService: RequestsService) {}
 
-  // Создание заявки (только авторизованный пользователь)
+  // Создание заявки
   @UseGuards(AccessTokenGuard)
   @Post()
   create(
@@ -32,8 +32,14 @@ export class RequestsController {
     );
   }
 
-  // Ниже — сгенерированные методы, НЕ ТРОГАЕМ (по заданию не нужны)
+  // ✅ ВХОДЯЩИЕ ЗАЯВКИ
+  @UseGuards(AccessTokenGuard)
+  @Get('incoming')
+  getIncoming(@Req() req: TAuthRequest) {
+    return this.requestsService.findIncoming(req.user.sub);
+  }
 
+  // ниже — НЕ ТРОГАЕМ
   @Get()
   findAll() {
     return this.requestsService.findAll();
