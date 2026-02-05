@@ -12,6 +12,7 @@ import { TAuthRequest, TJwtPayload } from './types/auth.types';
 import * as bcrypt from 'bcrypt';
 import { appConfig, TAppConfig } from '../config/app.config';
 import { RegisterDto } from './dto/register.dto';
+import { jwtConfig, TJwtConfig } from '../config/jwt.config';
 
 @Injectable()
 export class AuthService {
@@ -21,6 +22,8 @@ export class AuthService {
     private usersRepository: Repository<User>,
     @Inject(appConfig.KEY)
     private readonly config: TAppConfig,
+    @Inject(jwtConfig.KEY)
+    private readonly jwt: TJwtConfig,
   ) {}
 
   async register(registerDto: RegisterDto) {
@@ -90,15 +93,12 @@ export class AuthService {
 
   private async signTokens(payload: TJwtPayload) {
     const accessToken = await this.jwtService.signAsync(payload, {
-      secret: process.env.JWT_SECRET ?? 'big_secret',
-      expiresIn: (process.env.JWT_EXPIRES_IN ?? '1h') as StringValue,
+      secret: this.jwt.secret,
+      expiresIn: this.jwt.expiresIn as StringValue,
     });
     const refreshToken = await this.jwtService.signAsync(payload, {
-      secret:
-        process.env.JWT_REFRESH_SECRET ??
-        process.env.JWT_SECRET ??
-        'big_secret',
-      expiresIn: (process.env.JWT_REFRESH_EXPIRES_IN ?? '7d') as StringValue,
+      secret: this.jwt.refreshSecret,
+      expiresIn: this.jwt.refreshExpiresIn as StringValue,
     });
     return { accessToken, refreshToken };
   }
