@@ -10,18 +10,14 @@ import { dbConfig, TDBConfig } from './config/db.config';
 import { FilesModule } from './files/files.module';
 import { SkillsModule } from './skills/skills.module';
 import { UsersModule } from './users/users.module';
+import { jwtConfig } from './config/jwt.config';
 
 @Module({
   imports: [
-    JwtModule.register({
-      global: true, // ✅ JWT подключён глобально
-      secret: process.env.JWT_SECRET || 'jwt_secret',
-      signOptions: { expiresIn: '1h' },
-    }),
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env.dev.example',
-      load: [appConfig, dbConfig],
+      load: [appConfig, dbConfig, jwtConfig],
     }),
     TypeOrmModule.forRootAsync({
       inject: [dbConfig.KEY],
