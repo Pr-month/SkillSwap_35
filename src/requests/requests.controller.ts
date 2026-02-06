@@ -22,14 +22,8 @@ export class RequestsController {
   // Создание заявки (только авторизованный пользователь)
   @UseGuards(AccessTokenGuard)
   @Post()
-  create(
-    @Body() createRequestDto: CreateRequestDto,
-    @Req() req: TAuthRequest,
-  ) {
-    return this.requestsService.create(
-      createRequestDto,
-      req.user.sub,
-    );
+  create(@Body() createRequestDto: CreateRequestDto, @Req() req: TAuthRequest) {
+    return this.requestsService.create(createRequestDto, req.user.sub);
   }
 
   // Получение входящих заявок (где мы получатель)
@@ -59,13 +53,9 @@ export class RequestsController {
   }
 
   @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateRequestDto: UpdateRequestDto,
-  ) {
-    return this.requestsService.update(+id, updateRequestDto);
+  update(@Param('id') id: string) {
+    return this.requestsService.update(+id);
   }
-
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.requestsService.remove(+id);
