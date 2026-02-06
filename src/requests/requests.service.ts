@@ -56,22 +56,34 @@ export class RequestsService {
   }
 
   async findIncoming(userId: string) {
-    return this.requestsRepository.find({
+    const requests = await this.requestsRepository.find({
       where: { receiver: { id: userId } },
       relations: ['sender', 'receiver', 'requestedSkill', 'offeredSkill'],
       order: { createdAt: 'DESC' },
     });
+
+    if (!requests.length) {
+      throw new NotFoundException('Incoming requests not found');
+    }
+
+    return requests;
   }
 
   async findOutgoing(userId: string) {
-    return this.requestsRepository.find({
+    const requests = await this.requestsRepository.find({
       where: { sender: { id: userId } },
       relations: ['sender', 'receiver', 'requestedSkill', 'offeredSkill'],
       order: { createdAt: 'DESC' },
     });
+
+    if (!requests.length) {
+      throw new NotFoundException('Outgoing requests not found');
+    }
+
+    return requests;
   }
 
-  // Сгенерированные методы (по умолчанию)
+  // Сгенерированные методы — НЕ ТРОГАЕМ
   findAll() {
     return `This action returns all requests`;
   }
