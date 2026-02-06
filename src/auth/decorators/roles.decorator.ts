@@ -1,4 +1,5 @@
 import { SetMetadata } from '@nestjs/common';
+import { UserRole } from '../../users/enums/user.enums';
 
-// Декоратор Roles принимает список ролей и сохраняет в метаданные
-export const Roles = (...roles: string[]) => SetMetadata('roles', roles);
+export const Roles = (...roles: UserRole[]) =>
+  SetMetadata('roles', roles);
