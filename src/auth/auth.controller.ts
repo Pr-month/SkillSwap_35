@@ -24,7 +24,7 @@ import { RegisterDto } from './dto/register.dto';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) { }
+  constructor(private readonly authService: AuthService) {}
 
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
@@ -33,10 +33,7 @@ export class AuthController {
   }
 
   @Post('login')
-  login(
-    @Body() dto: LoginAuthDto,
-    @Res({ passthrough: true }) res: Response,
-  ) {
+  login(@Body() dto: LoginAuthDto, @Res({ passthrough: true }) res: Response) {
     return this.authService.login(dto, res);
   }
 

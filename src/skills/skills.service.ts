@@ -23,7 +23,7 @@ export class SkillsService {
     private readonly skillsRepository: Repository<Skill>,
     private readonly usersService: UsersService,
     @InjectRepository(User)
-    private readonly usersRepository: Repository<User>
+    private readonly usersRepository: Repository<User>,
   ) { }
 
   async create(
@@ -140,7 +140,9 @@ export class SkillsService {
     }
 
     if (skill.owner.id !== userId) {
-      throw new ForbiddenException('Недостаточно прав для обновления этого навыка');
+      throw new ForbiddenException(
+        'Недостаточно прав для обновления этого навыка',
+      );
     }
 
     Object.assign(skill, updateSkillDto);
@@ -159,7 +161,9 @@ export class SkillsService {
     }
 
     if (skill.owner.id !== userId) {
-      throw new ForbiddenException('Недостаточно прав для удаления этого навыка');
+      throw new ForbiddenException(
+        'Недостаточно прав для удаления этого навыка',
+      );
     }
 
     await this.skillsRepository.remove(skill);
@@ -168,7 +172,9 @@ export class SkillsService {
   }
 
   async addToFavorites(skillId: string, userId: string) {
-    const skill = await this.skillsRepository.findOne({ where: { id: skillId } });
+    const skill = await this.skillsRepository.findOne({
+      where: { id: skillId },
+    });
     if (!skill) {
       throw new NotFoundException('Skill not found');
     }
@@ -178,11 +184,11 @@ export class SkillsService {
       throw new NotFoundException('User not found');
     }
 
-    if (user.favoriteSkills.includes(skillId)) {
+    if (user.favoriteSkills.some(s => s.id === skillId)) {
       throw new ConflictException('Навык уже в избранном');
     }
 
-    user.favoriteSkills.push(skillId);
+    user.favoriteSkills.push(skill);
 
     await this.usersRepository.save(user);
 
@@ -196,7 +202,9 @@ export class SkillsService {
       throw new NotFoundException('User not found');
     }
 
-    const index = user.favoriteSkills.indexOf(skillId);
+    const index = user.favoriteSkills.findIndex(
+      (skill) => skill.id === skillId,
+    );
 
     if (index === -1) {
       throw new NotFoundException('Навык не найден в избранном');

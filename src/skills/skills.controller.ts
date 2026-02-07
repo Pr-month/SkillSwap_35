@@ -19,7 +19,7 @@ import { UpdateSkillDto } from './dto/update-skill.dto';
 
 @Controller('skills')
 export class SkillsController {
-  constructor(private readonly skillsService: SkillsService) { }
+  constructor(private readonly skillsService: SkillsService) {}
 
   @UseGuards(AccessTokenGuard)
   @Post()
@@ -36,7 +36,6 @@ export class SkillsController {
     return await this.skillsService.findAll(query);
   }
 
-
   @Patch(':id')
   @UseGuards(AccessTokenGuard)
   update(
@@ -50,30 +49,21 @@ export class SkillsController {
 
   @Delete(':id')
   @UseGuards(AccessTokenGuard)
-  remove(
-    @Param('id') id: string,
-    @Req() req: Request,
-  ) {
+  remove(@Param('id') id: string, @Req() req: Request) {
     const userId = (req as any).user.id;
     return this.skillsService.remove(id, userId);
   }
 
   @Post(':id/favorite')
   @UseGuards(AccessTokenGuard)
-  addToFavorites(
-    @Param('id') id: string,
-    @Req() req: Request,
-  ) {
+  addToFavorites(@Param('id') id: string, @Req() req: Request) {
     const userId = (req as any).user.id;
     return this.skillsService.addToFavorites(id, userId);
   }
 
   @Delete(':id/favorite')
   @UseGuards(AccessTokenGuard)
-  removeFromFavorites(
-    @Param('id') id: string,
-    @Req() req: Request,
-  ) {
+  removeFromFavorites(@Param('id') id: string, @Req() req: Request) {
     const userId = (req as any).user.id;
     return this.skillsService.removeFromFavorites(id, userId);
   }

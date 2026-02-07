@@ -1,5 +1,15 @@
-import { IsEmail, IsDefined, IsString, MinLength, Matches, IsDateString, IsISO8601, IsNotEmpty, IsEnum } from "class-validator";
-import { Gender } from "src/users/enums/user.enums";
+import {
+  IsEmail,
+  IsDefined,
+  IsString,
+  MinLength,
+  Matches,
+  IsDateString,
+  IsISO8601,
+  IsNotEmpty,
+  IsEnum,
+} from 'class-validator';
+import { Gender } from 'src/users/enums/user.enums';
 
 export class RegisterDto {
   @IsEmail()
