@@ -26,22 +26,41 @@ export class AuthService {
     private readonly jwt: TJwtConfig,
   ) {}
 
-  async register(registerDto: RegisterDto) {
+  async register(registerDto: RegisterDto, res: Response) {
     const hashedPassword = await bcrypt.hash(registerDto.password, 10);
-    const user = await this.usersRepository.create({
+
+    const user = this.usersRepository.create({
       ...registerDto,
       password: hashedPassword,
     });
 
+    // Сохраняем пользователя в БД
+    const savedUser = await this.usersRepository.save(user);
+
     const payload: TJwtPayload = {
-      sub: user.id,
-      email: user.email,
-      role: user.role,
+      sub: savedUser.id,
+      email: savedUser.email,
+      role: savedUser.role,
     };
 
-    const tokens = await this.signTokens(payload);
-    return { ...tokens };
+    const { accessToken, refreshToken } = await this.signTokens(payload);
+
+    // Хешируем refresh token
+    const hashedRefreshToken = await bcrypt.hash(
+      refreshToken,
+      this.config.hashSalt,
+    );
+
+    savedUser.refreshToken = hashedRefreshToken;
+    await this.usersRepository.save(savedUser);
+
+    // Кладём токены в cookies
+    res.cookie('accessToken', accessToken, { httpOnly: true });
+    res.cookie('refreshToken', refreshToken, { httpOnly: true });
+
+    return { message: 'Registration successful' };
   }
+
 
   async login({ email, password }: LoginAuthDto, res: Response) {
     const user = await this.usersRepository.findOne({
