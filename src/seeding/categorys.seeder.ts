@@ -6,12 +6,11 @@ export async function seedCategories(dataSource: DataSource) {
   const categoryRepository = dataSource.getRepository(Category);
 
   for (const parentCategoryData of CategoriesData) {
-    // Проверяем, существует ли родительская категория
+
     let parentCategory = await categoryRepository.findOne({
       where: { name: parentCategoryData.name },
     });
 
-    // Если нет — создаём
     if (!parentCategory) {
       parentCategory = categoryRepository.create({
         name: parentCategoryData.name,
@@ -20,7 +19,6 @@ export async function seedCategories(dataSource: DataSource) {
       parentCategory = await categoryRepository.save(parentCategory);
     }
 
-    // Создаём подкатегории
     for (const childName of parentCategoryData.children) {
       const existingChild = await categoryRepository.findOne({
         where: {
