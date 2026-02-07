@@ -24,7 +24,7 @@ export class SkillsService {
     private readonly usersService: UsersService,
     @InjectRepository(User)
     private readonly usersRepository: Repository<User>,
-  ) { }
+  ) {}
 
   async create(
     createSkillDto: CreateSkillDto,
@@ -184,7 +184,7 @@ export class SkillsService {
       throw new NotFoundException('User not found');
     }
 
-    if (user.favoriteSkills.some(s => s.id === skillId)) {
+    if (user.favoriteSkills.some((s) => s.id === skillId)) {
       throw new ConflictException('Навык уже в избранном');
     }
 
