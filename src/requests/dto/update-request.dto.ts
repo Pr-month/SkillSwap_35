@@ -1,4 +1,7 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateRequestDto } from './create-request.dto';
+import { IsIn } from 'class-validator';
+import { RequestStatus } from '../entities/request.entity';
 
-export class UpdateRequestDto extends PartialType(CreateRequestDto) {}
+export class UpdateRequestDto {
+  @IsIn([RequestStatus.ACCEPTED, RequestStatus.REJECTED])
+  status: RequestStatus.ACCEPTED | RequestStatus.REJECTED;
+}

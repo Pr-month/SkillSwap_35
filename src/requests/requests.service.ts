@@ -1,8 +1,14 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateRequestDto } from './dto/create-request.dto';
-import { Request } from './entities/request.entity';
+import { UpdateRequestDto } from './dto/update-request.dto';
+import { Request, RequestStatus } from './entities/request.entity';
 import { User } from '../users/entities/user.entity';
 import { Skill } from '../skills/entities/skill.entity';
 
@@ -81,6 +87,73 @@ export class RequestsService {
     }
 
     return requests;
+  }
+
+  async updateStatus(
+    requestId: string,
+    dto: UpdateRequestDto,
+    currentUserId: string,
+  ) {
+    const request = await this.requestsRepository.findOne({
+      where: { id: requestId },
+      relations: ['sender', 'receiver', 'requestedSkill', 'offeredSkill'],
+    });
+
+    if (!request) {
+      throw new NotFoundException('Request not found');
+    }
+
+    if (request.receiver.id !== currentUserId) {
+      throw new ForbiddenException('You can update only incoming requests');
+    }
+
+    if (request.status !== RequestStatus.PENDING) {
+      throw new ConflictException('Request status is already updated');
+    }
+
+    if (dto.status === RequestStatus.ACCEPTED) {
+      await this.requestsRepository.manager.transaction(async (manager) => {
+        const transactionalSkillRepository = manager.getRepository(Skill);
+        const transactionalRequestRepository = manager.getRepository(Request);
+
+        const senderSkill = transactionalSkillRepository.create({
+          title: request.requestedSkill.title,
+          description: request.requestedSkill.description,
+          category: request.requestedSkill.category,
+          images: [...(request.requestedSkill.images ?? [])],
+          owner: request.sender,
+        });
+
+        const receiverSkill = transactionalSkillRepository.create({
+          title: request.offeredSkill.title,
+          description: request.offeredSkill.description,
+          category: request.offeredSkill.category,
+          images: [...(request.offeredSkill.images ?? [])],
+          owner: request.receiver,
+        });
+
+        await transactionalSkillRepository.save([senderSkill, receiverSkill]);
+
+        request.status = dto.status;
+        request.isRead = true;
+        await transactionalRequestRepository.save(request);
+      });
+    } else {
+      request.status = dto.status;
+      request.isRead = true;
+      await this.requestsRepository.save(request);
+    }
+
+    const updatedRequest = await this.requestsRepository.findOne({
+      where: { id: requestId },
+      relations: ['sender', 'receiver', 'requestedSkill', 'offeredSkill'],
+    });
+
+    if (!updatedRequest) {
+      throw new NotFoundException('Request not found');
+    }
+
+    return updatedRequest;
   }
 
   // Сгенерированные методы — НЕ ТРОГАЕМ

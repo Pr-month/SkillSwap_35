@@ -11,6 +11,7 @@ import { FilesModule } from './files/files.module';
 import { SkillsModule } from './skills/skills.module';
 import { UsersModule } from './users/users.module';
 import { jwtConfig } from './config/jwt.config';
+import { RequestsModule } from './requests/requests.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { jwtConfig } from './config/jwt.config';
     AuthModule,
     FilesModule,
     SkillsModule,
+    RequestsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
