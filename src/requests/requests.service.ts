@@ -169,6 +169,25 @@ export class RequestsService {
     return `This action updates a #${id} request`;
   }
 
+  async removeOutgoing(requestId: string, currentUserId: string) {
+    const request = await this.requestsRepository.findOne({
+      where: { id: requestId },
+      relations: ['sender'],
+    });
+
+    if (!request) {
+      throw new NotFoundException('Request not found');
+    }
+
+    if (request.sender.id !== currentUserId) {
+      throw new ForbiddenException('You can delete only outgoing requests');
+    }
+
+    await this.requestsRepository.remove(request);
+
+    return { message: 'Request deleted' };
+  }
+
   remove(id: number) {
     return `This action removes a #${id} request`;
   }
