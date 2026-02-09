@@ -52,12 +52,19 @@ export class RequestsController {
     return this.requestsService.findOne(+id);
   }
 
+  @UseGuards(AccessTokenGuard)
   @Patch(':id')
-  update(@Param('id') id: string) {
-    return this.requestsService.update(+id);
+  update(
+    @Param('id') id: string,
+    @Body() updateRequestDto: UpdateRequestDto,
+    @Req() req: TAuthRequest,
+  ) {
+    return this.requestsService.updateStatus(id, updateRequestDto, req.user.sub);
   }
+
+  @UseGuards(AccessTokenGuard)
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.requestsService.remove(+id);
+  remove(@Param('id') id: string, @Req() req: TAuthRequest) {
+    return this.requestsService.removeOutgoing(id, req.user.sub);
   }
 }
