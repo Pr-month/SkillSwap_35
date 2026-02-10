@@ -52,3 +52,17 @@ export async function seedAdmin() {
     throw error;
   }
 }
+
+async function seed() {
+  try {
+    await seedAdmin();
+  } catch (error) {
+    console.error(error);
+    process.exit(1);
+  } finally {
+    await AppDataSource.destroy();
+    console.log('Database connection closed');
+  }
+}
+
+seed();
