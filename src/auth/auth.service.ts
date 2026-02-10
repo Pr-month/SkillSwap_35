@@ -12,6 +12,7 @@ import { TAuthRequest, TJwtPayload } from './types/auth.types';
 import * as bcrypt from 'bcrypt';
 import { appConfig, TAppConfig } from '../config/app.config';
 import { RegisterDto } from './dto/register.dto';
+import { jwtConfig, TJwtConfig } from '../config/jwt.config';
 
 @Injectable()
 export class AuthService {
@@ -21,24 +22,45 @@ export class AuthService {
     private usersRepository: Repository<User>,
     @Inject(appConfig.KEY)
     private readonly config: TAppConfig,
+    @Inject(jwtConfig.KEY)
+    private readonly jwt: TJwtConfig,
   ) {}
 
-  async register(registerDto: RegisterDto) {
+  async register(registerDto: RegisterDto, res: Response) {
     const hashedPassword = await bcrypt.hash(registerDto.password, 10);
-    const user = await this.usersRepository.create({
+
+    const user = this.usersRepository.create({
       ...registerDto,
       password: hashedPassword,
     });
 
+    // Сохраняем пользователя в БД
+    const savedUser = await this.usersRepository.save(user);
+
     const payload: TJwtPayload = {
-      sub: user.id,
-      email: user.email,
-      role: user.role,
+      sub: savedUser.id,
+      email: savedUser.email,
+      role: savedUser.role,
     };
 
-    const tokens = await this.signTokens(payload);
-    return { ...tokens };
+    const { accessToken, refreshToken } = await this.signTokens(payload);
+
+    // Хешируем refresh token
+    const hashedRefreshToken = await bcrypt.hash(
+      refreshToken,
+      this.config.hashSalt,
+    );
+
+    savedUser.refreshToken = hashedRefreshToken;
+    await this.usersRepository.save(savedUser);
+
+    // Кладём токены в cookies
+    res.cookie('accessToken', accessToken, { httpOnly: true });
+    res.cookie('refreshToken', refreshToken, { httpOnly: true });
+
+    return { message: 'Registration successful' };
   }
+
 
   async login({ email, password }: LoginAuthDto, res: Response) {
     const user = await this.usersRepository.findOne({
@@ -90,15 +112,12 @@ export class AuthService {
 
   private async signTokens(payload: TJwtPayload) {
     const accessToken = await this.jwtService.signAsync(payload, {
-      secret: process.env.JWT_SECRET ?? 'big_secret',
-      expiresIn: (process.env.JWT_EXPIRES_IN ?? '1h') as StringValue,
+      secret: this.jwt.secret,
+      expiresIn: this.jwt.expiresIn as StringValue,
     });
     const refreshToken = await this.jwtService.signAsync(payload, {
-      secret:
-        process.env.JWT_REFRESH_SECRET ??
-        process.env.JWT_SECRET ??
-        'big_secret',
-      expiresIn: (process.env.JWT_REFRESH_EXPIRES_IN ?? '7d') as StringValue,
+      secret: this.jwt.refreshSecret,
+      expiresIn: this.jwt.refreshExpiresIn as StringValue,
     });
     return { accessToken, refreshToken };
   }

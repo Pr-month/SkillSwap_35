@@ -8,6 +8,7 @@ import {
   Delete,
   Req,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -15,6 +16,7 @@ import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AccessTokenGuard } from '../auth/guards/access-token.guard';
 import { TAuthRequest } from '../auth/types/auth.types';
+import { UserQueryDto } from './dto/user-query.dto';
 
 @Controller('users')
 export class UsersController {
@@ -26,8 +28,8 @@ export class UsersController {
   }
 
   @Get()
-  findAll() {
-    return this.usersService.findAll();
+  findAll(@Query() query: UserQueryDto) {
+    return this.usersService.findAll(query);
   }
 
   @UseGuards(AccessTokenGuard)
@@ -44,10 +46,7 @@ export class UsersController {
 
   @UseGuards(AccessTokenGuard)
   @Patch('me')
-  updateMe(
-    @Req() req: TAuthRequest,
-    @Body() updateUserDto: UpdateUserDto,
-  ) {
+  updateMe(@Req() req: TAuthRequest, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.updateCurrentUser(req.user.sub, updateUserDto);
   }
 
