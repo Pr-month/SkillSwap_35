@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import type { StringValue } from 'ms';
@@ -13,31 +13,27 @@ import { UsersModule } from './users/users.module';
 
 import { appConfig } from './config/app.config';
 import { dbConfig, TDBConfig } from './config/db.config';
+import { jwtConfig, TJwtConfig } from './config/jwt.config';
 
 @Module({
   imports: [
-    // ✅ Config глобально
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env.dev.example',
-      load: [appConfig, dbConfig],
+      load: [appConfig, dbConfig, jwtConfig],
     }),
 
-    // ✅ JWT глобально + async + config
     JwtModule.registerAsync({
       global: true,
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET'),
+      inject: [jwtConfig.KEY],
+      useFactory: (config: TJwtConfig) => ({
+        secret: config.secret,
         signOptions: {
-          expiresIn: configService.get<string>(
-            'JWT_EXPIRES_IN',
-          ) as StringValue,
+          expiresIn: config.expiresIn as StringValue,
         },
       }),
     }),
 
-    // ✅ TypeORM
     TypeOrmModule.forRootAsync({
       inject: [dbConfig.KEY],
       useFactory: (dbConfig: TDBConfig) => ({
