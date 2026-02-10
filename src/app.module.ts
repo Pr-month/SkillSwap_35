@@ -10,7 +10,6 @@ import { AuthModule } from './auth/auth.module';
 import { FilesModule } from './files/files.module';
 import { SkillsModule } from './skills/skills.module';
 import { UsersModule } from './users/users.module';
-import { jwtConfig } from './config/jwt.config';
 import { RequestsModule } from './requests/requests.module';
 
 import { appConfig } from './config/app.config';
