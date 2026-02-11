@@ -19,9 +19,7 @@ async function bootstrap() {
       validationError: { target: false, value: false },
     }),
   );
-  app.useGlobalInterceptors(
-    new ClassSerializerInterceptor(app.get(Reflector)),
-  );
+  app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
   app.use(cookieParser());
   app.useStaticAssets(join(__dirname, '..', 'public'));
   app.useGlobalFilters(new MulterExceptionFilter(), new AllExceptionFilter());

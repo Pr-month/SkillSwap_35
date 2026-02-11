@@ -61,7 +61,6 @@ export class AuthService {
     return { message: 'Registration successful' };
   }
 
-
   async login({ email, password }: LoginAuthDto, res: Response) {
     const user = await this.usersRepository.findOne({
       where: { email },
