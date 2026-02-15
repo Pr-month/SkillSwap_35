@@ -13,8 +13,9 @@ export const dbConfig = registerAs(
     password: process.env.DB_PASSWORD || 'postgres',
     database: process.env.DB_DATABASE || 'skillswap',
     entities: [__dirname + '/../**/*.entity{.ts,.js}'],
-    synchronize: process.env.DB_SYNCHRONIZE == 'false',
-    logging: process.env.DB_LOGGING == 'true',
+    synchronize: process.env.DB_SYNCHRONIZE !== 'false',
+    dropSchema: process.env.NODE_ENV === 'test', // очистка схемы для E2E
+    logging: process.env.DB_LOGGING === 'true',
   }),
 );
 

@@ -20,7 +20,7 @@ import { jwtConfig, TJwtConfig } from './config/jwt.config';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.env.dev.example',
+      envFilePath: process.env.NODE_ENV === 'test' ? '.env.local' : '.env.dev.example',
       load: [appConfig, dbConfig, jwtConfig],
     }),
 
