@@ -1,6 +1,7 @@
 import { DataSource } from 'typeorm';
 import { Skill } from '../skills/entities/skill.entity';
 import { User } from '../users/entities/user.entity';
+import { AppDataSource } from '../config/db.config';
 
 export async function seedTestSkills(dataSource: DataSource) {
   const userRepository = dataSource.getRepository(User);
@@ -49,3 +50,25 @@ export async function seedTestSkills(dataSource: DataSource) {
 
   console.log('✅ Test skills seeded successfully');
 }
+
+async function seed() {
+  try {
+    if (!AppDataSource.isInitialized) {
+      await AppDataSource.initialize();
+    }
+
+    await seedTestSkills(AppDataSource);
+
+    console.log('🎉 Seeding finished');
+  } catch (error) {
+    console.error('❌ Seeding error:', error);
+    process.exit(1);
+  } finally {
+    if (AppDataSource.isInitialized) {
+      await AppDataSource.destroy();
+    }
+    console.log('🔌 Database connection closed');
+  }
+}
+
+seed();
