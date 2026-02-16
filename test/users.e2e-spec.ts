@@ -13,8 +13,6 @@ describe('Users (e2e)', () => {
   const adminPassword = process.env.ADMIN_PASSWORD || 'admin1234';
 
   beforeAll(async () => {
-    await seedAdmin();
-
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
@@ -35,9 +33,6 @@ describe('Users (e2e)', () => {
 
   afterAll(async () => {
     await app.close();
-    if (AppDataSource.isInitialized) {
-      await AppDataSource.destroy();
-    }
   });
 
   it('GET /users (public)', async () => {
