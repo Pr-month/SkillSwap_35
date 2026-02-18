@@ -20,10 +20,12 @@ import { jwtConfig, TJwtConfig } from './config/jwt.config';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.env.dev.example',
+      envFilePath:
+        process.env.NODE_ENV === 'test'
+          ? '.env.test.local'
+          : '.env.local',
       load: [appConfig, dbConfig, jwtConfig],
     }),
-
     JwtModule.registerAsync({
       global: true,
       inject: [jwtConfig.KEY],

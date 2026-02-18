@@ -1,7 +1,10 @@
 import { ConfigType, registerAs } from '@nestjs/config';
 import { DataSource, DataSourceOptions } from 'typeorm';
 import * as dotenv from 'dotenv';
-dotenv.config();
+// 🔥 ЯВНО выбираем env-файл
+const envFile = process.env.NODE_ENV === 'test' ? '.env.test.local' : '.env';
+
+dotenv.config({ path: envFile });
 
 export const dbConfig = registerAs(
   'DB_CONFIG',
