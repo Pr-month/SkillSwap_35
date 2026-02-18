@@ -3,10 +3,11 @@ import * as dotenv from 'dotenv';
 import { AppDataSource } from '../config/db.config';
 import { User } from '../users/entities/user.entity';
 import { Gender, UserRole } from '../users/enums/user.enums';
+import { DataSource } from 'typeorm';
 
 dotenv.config({ path: '.env.local' }); // указываем тестовый env
 
-export async function seedAdmin() {
+export async function seedAdmin(AppDataSource: DataSource) {
   if (!AppDataSource.isInitialized) {
     await AppDataSource.initialize();
   }
@@ -50,9 +51,9 @@ export async function seedAdmin() {
 }
 
 // Для Jest — вызываем через setup файл, без process.exit
-export async function runSeedAdmin() {
+export async function runSeedAdmin(dataSource: DataSource) {
   try {
-    await seedAdmin();
+    await seedAdmin(dataSource);
   } catch (error) {
     console.error(error);
     throw error; // важно: не process.exit!

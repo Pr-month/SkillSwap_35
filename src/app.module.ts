@@ -23,7 +23,7 @@ import { jwtConfig, TJwtConfig } from './config/jwt.config';
       envFilePath:
         process.env.NODE_ENV === 'test'
           ? '.env.test.local'
-          : '.env.dev.example',
+          : '.env.local',
       load: [appConfig, dbConfig, jwtConfig],
     }),
     JwtModule.registerAsync({

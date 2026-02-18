@@ -1,7 +1,6 @@
 import { ConfigType, registerAs } from '@nestjs/config';
-import { DataSourceOptions } from 'typeorm';
+import { DataSource, DataSourceOptions } from 'typeorm';
 import * as dotenv from 'dotenv';
-
 // 🔥 ЯВНО выбираем env-файл
 const envFile = process.env.NODE_ENV === 'test' ? '.env.test.local' : '.env';
 
@@ -16,10 +15,12 @@ export const dbConfig = registerAs(
     username: process.env.DB_USERNAME || 'postgres',
     password: process.env.DB_PASSWORD || 'postgres',
     database: process.env.DB_DATABASE || 'skillswap',
-
-    synchronize: false, // ❗ только миграции
-    logging: process.env.DB_LOGGING === 'true',
+    entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+    synchronize: process.env.DB_SYNCHRONIZE == 'false',
+    logging: process.env.DB_LOGGING == 'true',
   }),
 );
 
 export type TDBConfig = ConfigType<typeof dbConfig>;
+
+export const AppDataSource = new DataSource(dbConfig());
