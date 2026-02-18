@@ -1,7 +1,8 @@
 import { DataSource } from 'typeorm';
-import { runSeedAdmin } from '../src/seeds/admin.seed';
 import { seedCategories } from '../src/seeding/categorys.seeder';
 import { seedUsers } from '../src/seeding/users.seeder';
+import { runSeedAdmin } from '../src/seeding/admin.seed';
+import { seedTestSkills } from 'src/seeding/skills.seeder';
 
 export async function setupE2EDatabase(dataSource: DataSource) {
   if (process.env.NODE_ENV !== 'test') {
@@ -20,5 +21,6 @@ export async function setupE2EDatabase(dataSource: DataSource) {
   // 2. Сиды
   await runSeedAdmin(dataSource);
   await seedUsers(dataSource);
+  await seedTestSkills(dataSource);
   await seedCategories(dataSource);
 }

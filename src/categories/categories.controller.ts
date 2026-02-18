@@ -14,8 +14,9 @@ import { CategoriesService } from './categories.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { AccessTokenGuard } from '../auth/guards/access-token.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../users/enums/user.enums';
-import { TAuthRequest } from '../auth/types/auth.types';
+import { RolesGuard } from '../auth/guards/roles.guard';
 
 @Controller('categories')
 export class CategoriesController {
@@ -26,37 +27,24 @@ export class CategoriesController {
     return this.categoriesService.findAll();
   }
 
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(AccessTokenGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   @Post()
-  create(@Req() req: TAuthRequest, @Body() dto: CreateCategoryDto) {
-    if (req.user.role !== UserRole.ADMIN) {
-      throw new ForbiddenException('Access denied');
-    }
-
+  create(@Body() dto: CreateCategoryDto) {
     return this.categoriesService.create(dto);
   }
 
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(AccessTokenGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   @Patch(':id')
-  update(
-    @Req() req: TAuthRequest,
-    @Param('id') id: string,
-    @Body() dto: UpdateCategoryDto,
-  ) {
-    if (req.user.role !== UserRole.ADMIN) {
-      throw new ForbiddenException('Access denied');
-    }
-
+  update(@Param('id') id: string, @Body() dto: UpdateCategoryDto) {
     return this.categoriesService.update(id, dto);
   }
 
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(AccessTokenGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   @Delete(':id')
-  remove(@Req() req: TAuthRequest, @Param('id') id: string) {
-    if (req.user.role !== UserRole.ADMIN) {
-      throw new ForbiddenException('Access denied');
-    }
-
+  remove(@Param('id') id: string) {
     return this.categoriesService.remove(id);
   }
 }
