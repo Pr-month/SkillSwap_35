@@ -102,13 +102,13 @@ export class AuthService {
     return { message: 'Login successful' };
   }
 
-  logout(_req: TAuthRequest, res: Response) {
+  async logout(_req: TAuthRequest, res: Response) {
     res.clearCookie('accessToken');
     res.clearCookie('refreshToken');
     
     const userId = _req.user?.sub;
     if (userId) {
-      this.usersRepository.update(userId, { refreshToken: '' });
+      await this.usersRepository.update(userId, { refreshToken: '' });
     }
 
     return { message: 'Logged out' };
