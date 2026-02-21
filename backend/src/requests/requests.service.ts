@@ -24,6 +24,12 @@ export class RequestsService {
   ) {}
 
   async create(dto: CreateRequestDto, senderId: string) {
+    if (dto.requestedSkillId === dto.offeredSkillId) {
+      throw new ConflictException(
+        'requestedSkillId and offeredSkillId must be different',
+      );
+    }
+
     const sender = await this.usersRepository.findOne({
       where: { id: senderId },
     });
