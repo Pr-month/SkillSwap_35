@@ -12,14 +12,14 @@ export class CitiesService {
   ) {}
 
   async findAll(query: GetCitiesDto) {
-    const { search, limit} = query;
+    const { search, limit } = query;
     const qb = this.cityRepository.createQueryBuilder('city');
 
     qb.select(['city.id', 'city.name']);
     if (search && search.trim()) {
       qb.where('city.name ILIKE :search', { search: `%${search.trim()}%` });
     }
-    if(limit !== undefined) qb.take(limit);
+    if (limit !== undefined) qb.take(limit);
 
     return qb.getMany();
   }

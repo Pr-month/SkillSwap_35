@@ -52,7 +52,7 @@ export function ProfileForm() {
 
   const cities = useSelector(getCitiesSelector);
   useEffect(() => {
-    if(cities.length === 0) {
+    if (cities.length === 0) {
       dispatch(getCities());
     }
   }, []);

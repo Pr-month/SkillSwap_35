@@ -59,7 +59,11 @@ export class RequestsController {
     @Body() updateRequestDto: UpdateRequestDto,
     @Req() req: TAuthRequest,
   ) {
-    return this.requestsService.updateStatus(id, updateRequestDto, req.user.sub);
+    return this.requestsService.updateStatus(
+      id,
+      updateRequestDto,
+      req.user.sub,
+    );
   }
 
   @UseGuards(AccessTokenGuard)

@@ -54,8 +54,7 @@ describe('FilesController (e2e)', () => {
   });
 
   it('/upload (POST) - should fail when no file provided', async () => {
-    const res = await request(app.getHttpServer())
-      .post('/upload');
+    const res = await request(app.getHttpServer()).post('/upload');
 
     expect(res.status).toBe(HttpStatus.BAD_REQUEST);
     expect(res.body.message).toBe('File not provided');

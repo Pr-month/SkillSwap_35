@@ -1,7 +1,7 @@
 import { AppDataSource } from '../config/db.config';
 import { seedCities } from './cities.seeder';
 
-;(async () => {
+(async () => {
   await AppDataSource.initialize();
 
   try {

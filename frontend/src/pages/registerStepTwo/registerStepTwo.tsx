@@ -31,9 +31,9 @@ export const RegisterStepTwo: FC = () => {
   const dispatch = useDispatch();
   const defaultValues = useSelector(state => state.register.stepTwoData);
   const genders = ['Мужской', 'Женский'] as const;
-  
+
   useEffect(() => {
-    if(cities.length === 0) {
+    if (cities.length === 0) {
       dispatch(getCities());
     }
   }, []);
@@ -73,10 +73,7 @@ export const RegisterStepTwo: FC = () => {
         }
         return age >= 12 && age <= 100;
       }),
-    city: yup
-      .string()
-      .required('Укажите город')
-      .oneOf(cities, 'Выбранный город не существует'),
+    city: yup.string().required('Укажите город').oneOf(cities, 'Выбранный город не существует'),
     gender: yup.string().required('Укажите пол').oneOf(genders, 'Выберите пол'),
     categories: yup
       .array()

@@ -29,7 +29,7 @@ export const Autocomplete = forwardRef<HTMLInputElement, AutocompleteProps>(
       if (debouncedInputValue && !selectionMade) {
         const filtered = suggestions
           .filter(item => item.toLowerCase().includes(debouncedInputValue.toLowerCase()))
-          .sort((a, b) => a.localeCompare(b))
+          .sort((a, b) => a.localeCompare(b));
         setFilteredSuggestions(filtered);
         setIsOpen(filtered.length > 0);
       } else {

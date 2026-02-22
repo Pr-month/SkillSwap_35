@@ -22,9 +22,7 @@ import { CitiesModule } from './cities/cities.module';
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath:
-        process.env.NODE_ENV === 'test'
-          ? '.env.test.local'
-          : '.env.local',
+        process.env.NODE_ENV === 'test' ? '.env.test.local' : '.env.local',
       load: [appConfig, dbConfig, jwtConfig],
     }),
     JwtModule.registerAsync({
@@ -51,7 +49,7 @@ import { CitiesModule } from './cities/cities.module';
     FilesModule,
     SkillsModule,
     RequestsModule,
-    CitiesModule
+    CitiesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

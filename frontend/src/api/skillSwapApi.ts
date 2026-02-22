@@ -25,9 +25,9 @@ export const getSkillsApi = async () => {
 };
 
 export type TSity = {
-  id: string, 
-  name: string
-}
+  id: string;
+  name: string;
+};
 type SitiesResponse = Array<TSity>;
 
 export const getSitiesApi = async (search?: string, limit?: number) => {
