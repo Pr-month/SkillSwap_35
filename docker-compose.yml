@@ -11,8 +11,8 @@ services:
       POSTGRES_DB: skillswap
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
+    networks:
+      - net
 
   backend:
     build:
@@ -28,6 +28,8 @@ services:
       - postgres
     ports:
       - "3000:3000"
+    networks:
+      - net
 
   frontend:
     build:
@@ -36,11 +38,17 @@ services:
     container_name: skillswap-frontend
     restart: unless-stopped
     environment:
-      VITE_SKILLSWAP_API_URL: http://localhost:3000
+      VITE_SKILLSWAP_API_URL: http://backend:3000
     ports:
       - "5173:3000"
     depends_on:
       - backend
+    networks:
+      - net
 
 volumes:
   postgres_data:
+
+networks:
+  net:
+    driver: bridge
