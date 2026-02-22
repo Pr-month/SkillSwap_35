@@ -15,12 +15,14 @@ import filtersReducer from '@/services/slices/filtersSlice';
 import likeReducer from '@/services/slices/likeSlice';
 
 import authSlice from '../slices/authSlice';
+import { citiesReducer } from '../slices/citiesSlice';
 
 export const rootReducer = combineSlices({
   register: registrationReducer,
   catalog: catalogReducer,
   exchange: exchangeReducer,
   skills: skillsReducer,
+  cities: citiesReducer,
   [stepsSlice.name]: stepsSlice.reducer,
   filters: filtersReducer,
   likes: likeReducer,
