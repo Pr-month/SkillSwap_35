@@ -1,19 +1,20 @@
-import { skillsCategories } from '@/shared/lib/categories';
+import { User } from '@/entities/user/model/types';
 
-export type SkillCategory = keyof typeof skillsCategories;
-export type SkillSubcategory<T extends SkillCategory> = (typeof skillsCategories)[T][number];
-
+/**
+ * Тип навыка, соответствующий backend SkillDto
+ */
 export type Skill = {
-  [K in SkillCategory]: {
-    category: K;
-    subcategory: SkillSubcategory<K>;
-    subcategoryId: string;
-  };
-}[SkillCategory];
+  id: string;
 
-export type CustomSkill = Skill & {
-  name: string;
-  image: string[] | File[];
+  title: string;
   description: string;
-  customSkillId: string;
+
+  category: string;
+
+  images: string[];
+
+  owner: User;
+
+  createdAt: string;
+  updatedAt: string;
 };

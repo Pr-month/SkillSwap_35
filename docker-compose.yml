@@ -1,0 +1,54 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: skillswap-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: skillswap
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - net
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: skillswap-backend
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env
+    environment:
+      DB_HOST: postgres
+    depends_on:
+      - postgres
+    ports:
+      - "3000:3000"
+    networks:
+      - net
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: skillswap-frontend
+    restart: unless-stopped
+    environment:
+      VITE_SKILLSWAP_API_URL: http://backend:3000
+    ports:
+      - "5173:3000"
+    depends_on:
+      - backend
+    networks:
+      - net
+
+volumes:
+  postgres_data:
+
+networks:
+  net:
+    driver: bridge
