@@ -102,10 +102,15 @@ export class AuthService {
     return { message: 'Login successful' };
   }
 
-  logout(_req: TAuthRequest, res: Response) {
+  async logout(_req: TAuthRequest, res: Response) {
     res.clearCookie('accessToken');
     res.clearCookie('refreshToken');
-    // TODO: очистить refreshToken в БД позже
+    
+    const userId = _req.user?.sub;
+    if (userId) {
+      await this.usersRepository.update(userId, { refreshToken: '' });
+    }
+
     return { message: 'Logged out' };
   }
 
@@ -122,7 +127,18 @@ export class AuthService {
   }
 
   async refresh(req: TAuthRequest, res: Response) {
+    const userPayload = req.user;
+    
     const { accessToken, refreshToken } = await this.signTokens(req.user);
+
+    const hashedRefreshToken = await bcrypt.hash(
+      refreshToken,
+      this.config.hashSalt,
+    );
+
+    await this.usersRepository.update(userPayload.sub, {
+      refreshToken: hashedRefreshToken,
+    });
 
     res.cookie('accessToken', accessToken, { httpOnly: true });
     res.cookie('refreshToken', refreshToken, { httpOnly: true });

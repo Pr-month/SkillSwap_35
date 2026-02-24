@@ -16,6 +16,7 @@ import { appConfig } from './config/app.config';
 import { dbConfig, TDBConfig } from './config/db.config';
 import { jwtConfig, TJwtConfig } from './config/jwt.config';
 import { CitiesModule } from './cities/cities.module';
+import { NotificationsModule } from './notifications/notifications.module';
 
 @Module({
   imports: [
@@ -50,6 +51,7 @@ import { CitiesModule } from './cities/cities.module';
     SkillsModule,
     RequestsModule,
     CitiesModule,
+    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

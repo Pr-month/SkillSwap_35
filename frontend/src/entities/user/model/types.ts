@@ -1,41 +1,28 @@
-import { CustomSkill } from '@/entities/skill/model/types';
+import { Skill } from '@/entities/skill/model/types';
 
+/**
+ * Тип пользователя, соответствующий backend UserDto
+ */
 export type User = {
-  createdAt: string | number | Date;
-  _id: string;
-  name: string;
-  image: string | File[];
-  city: string;
-  gender: GenderOption['value'];
-  birthdayDate: string;
-  description: string;
-  likes: string[];
-  canTeach: CustomSkill;
-  wantsToLearn: Omit<CustomSkill, 'description' | 'image'>[];
-  email?: string;
-};
-
-export type ExchangeRequest = {
   id: string;
-  fromUserId: string;
-  fromUserName: string;
-  toUserId?: string;
-  isRead: boolean;
+
+  name: string;
+  email: string;
+
+  about: string | null;
+  birthdate: string | null; // Date приходит как ISO-строка
+  city: string | null;
+
+  gender: 'NOT_SPECIFIED' | 'MALE' | 'FEMALE';
+
+  avatar: string | null;
+
+  skills: Skill[];
+  wantToLearn: Skill[];
+  favoriteSkills: Skill[];
+
+  role: 'USER' | 'ADMIN';
+
   createdAt: string;
-};
-
-export type ExperienceOption = {
-  value: 'all' | 'want-to-learn' | 'can-teach';
-  label: string;
-};
-
-export type GenderOption = {
-  value: 'any' | 'male' | 'female';
-  label: string;
-};
-
-export type UserCardProps = User & {
-  showDetails?: boolean;
-  showLike?: boolean;
-  showDescription?: boolean;
+  updatedAt: string;
 };
