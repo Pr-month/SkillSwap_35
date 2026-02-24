@@ -11,7 +11,7 @@ import { UpdateRequestDto } from './dto/update-request.dto';
 import { Request, RequestStatus } from './entities/request.entity';
 import { User } from '../users/entities/user.entity';
 import { Skill } from '../skills/entities/skill.entity';
-import { NotificationGateway } from 'src/notifications/notifications.gateway';
+import { NotificationGateway } from '../notifications/notifications.gateway';
 
 @Injectable()
 export class RequestsService {
