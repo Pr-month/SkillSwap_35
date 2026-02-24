@@ -19,7 +19,7 @@ export class UserDto {
   birthdate: Date | null;
 
   @Expose()
-  city: string | null;
+  city: number | null;
 
   @Expose()
   gender: Gender;

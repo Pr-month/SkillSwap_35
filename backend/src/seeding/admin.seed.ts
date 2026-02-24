@@ -34,7 +34,7 @@ export async function seedAdmin(AppDataSource: DataSource) {
     password: hashedPassword,
     about: 'Суперпользователь',
     birthdate: new Date('1990-01-01'),
-    city: 'Москва',
+    city: 1,
     gender: Gender.NOT_SPECIFIED,
     avatar: '',
     role: UserRole.ADMIN,

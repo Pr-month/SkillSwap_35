@@ -33,8 +33,8 @@ export class User {
   @Column({ type: 'date', nullable: true })
   birthdate: Date;
 
-  @Column({ type: 'varchar', length: 100, nullable: true })
-  city: string;
+  @Column({ type: 'int', nullable: true })
+  city: number;
 
   @Column({
     type: 'enum',
