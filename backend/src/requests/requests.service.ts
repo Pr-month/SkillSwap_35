@@ -11,6 +11,7 @@ import { UpdateRequestDto } from './dto/update-request.dto';
 import { Request, RequestStatus } from './entities/request.entity';
 import { User } from '../users/entities/user.entity';
 import { Skill } from '../skills/entities/skill.entity';
+import { NotificationGateway } from 'src/notifications/notifications.gateway';
 
 @Injectable()
 export class RequestsService {
@@ -21,7 +22,8 @@ export class RequestsService {
     private readonly usersRepository: Repository<User>,
     @InjectRepository(Skill)
     private readonly skillsRepository: Repository<Skill>,
-  ) {}
+    private readonly notificationGateway: NotificationGateway,
+  ) { }
 
   async create(dto: CreateRequestDto, senderId: string) {
     if (dto.requestedSkillId === dto.offeredSkillId) {
@@ -64,7 +66,19 @@ export class RequestsService {
       offeredSkill,
     });
 
-    return this.requestsRepository.save(request);
+    const savedRequest = await this.requestsRepository.save(request);
+
+    this.notificationGateway.notifyUser(receiver.id, {
+      type: 'newRequest',
+      skillTitle: requestedSkill.title,
+      fromUser: {
+        id: sender.id,
+        name: sender.name,
+        avatar: sender.avatar ?? null,
+      },
+    });
+
+    return savedRequest;
   }
 
   async findIncoming(userId: string) {
@@ -159,6 +173,24 @@ export class RequestsService {
       throw new NotFoundException('Request not found');
     }
 
+    if (
+      dto.status === RequestStatus.ACCEPTED ||
+      dto.status === RequestStatus.REJECTED
+    ) {
+      this.notificationGateway.notifyUser(updatedRequest.sender.id, {
+        type:
+          dto.status === RequestStatus.ACCEPTED
+            ? 'requestAccepted'
+            : 'requestDeclined',
+        skillTitle: updatedRequest.requestedSkill.title,
+        fromUser: {
+          id: updatedRequest.receiver.id,
+          name: updatedRequest.receiver.name,
+          avatar: updatedRequest.receiver.avatar ?? null,
+        },
+      });
+    }
+    
     return updatedRequest;
   }
 
