@@ -1,6 +1,8 @@
+import { Type } from 'class-transformer';
 import {
   IsDateString,
   IsEnum,
+  IsInt,
   IsOptional,
   IsString,
   IsUrl,
@@ -23,9 +25,9 @@ export class UpdateUserDto {
   birthdate?: string;
 
   @IsOptional()
-  @IsString()
-  @MaxLength(100)
-  city?: string;
+  @Type(() => Number)
+  @IsInt()
+  city?: number;
 
   @IsOptional()
   @IsEnum(Gender)

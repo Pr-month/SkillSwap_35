@@ -19,7 +19,7 @@ const registerDto: RegisterDto = {
   name: 'Anton',
   birthdate: '1995-05-20',
   gender: Gender.MALE,
-  city: 'Kyiv',
+  city: 1,
   about: 'about me',
 };
 
