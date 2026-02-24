@@ -1,20 +1,14 @@
 {
   "moduleFileExtensions": ["js", "json", "ts"],
-  "rootDir": "../",
+  "rootDir": ".",
+  "maxWorkers": 1,
   "testEnvironment": "node",
-<<<<<<< HEAD
   "testRegex": ".e2e-spec.ts$",
   "setupFilesAfterEnv": ["<rootDir>/setup-e2e.ts"],
   "moduleNameMapper": {
     "^src/(.*)$": "<rootDir>/../src/$1"
   },
-=======
-  "testRegex": "test/.*\\.e2e-spec\\.ts$",
->>>>>>> week4
   "transform": {
-    "^.+\\.(t|j)s$": ["ts-jest", { "tsconfig": "tsconfig.json" }]
-  },
-  "moduleNameMapper": {
-    "^src/(.*)$": "<rootDir>/src/$1"
+    "^.+\\.(t|j)s$": "ts-jest"
   }
 }
