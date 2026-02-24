@@ -13,10 +13,16 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+
     "seed:categories": "ts-node -r tsconfig-paths/register src/seeding/categorys.seeder.ts",
     "seed:test:users": "ts-node -r tsconfig-paths/register src/seeding/users.seeder.ts",
     "seed:admin": "ts-node -r tsconfig-paths/register src/seeds/admin.seed.ts",
     "seed:test:skills": "ts-node -r tsconfig-paths/register src/seeding/skills.seeder.ts",
+<<<<<<< week4-Lem0n4eLL0
+    "seed:run": "ts-node -r tsconfig-paths/register -r dotenv/config src/seeding/run.ts",
+
+=======
+>>>>>>> week4
     "migrate:generate": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:generate -d src/config/db.config.ts",
     "migrate:run": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:run -d src/config/db.config.ts",
     "migrate:revert": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:revert -d src/config/db.config.ts",

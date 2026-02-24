@@ -7,7 +7,6 @@ export async function seedCategories(dataSource: DataSource) {
   const categoryRepository = dataSource.getRepository(Category);
 
   for (const parentCategoryData of CategoriesData) {
-
     let parentCategory = await categoryRepository.findOne({
       where: { name: parentCategoryData.name },
     });

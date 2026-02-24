@@ -15,6 +15,7 @@ import { RequestsModule } from './requests/requests.module';
 import { appConfig } from './config/app.config';
 import { dbConfig, TDBConfig } from './config/db.config';
 import { jwtConfig, TJwtConfig } from './config/jwt.config';
+import { CitiesModule } from './cities/cities.module';
 import { NotificationsModule } from './notifications/notifications.module';
 
 @Module({
@@ -22,9 +23,7 @@ import { NotificationsModule } from './notifications/notifications.module';
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath:
-        process.env.NODE_ENV === 'test'
-          ? '.env.test.local'
-          : '.env.local',
+        process.env.NODE_ENV === 'test' ? '.env.test.local' : '.env.local',
       load: [appConfig, dbConfig, jwtConfig],
     }),
     JwtModule.registerAsync({
@@ -51,6 +50,7 @@ import { NotificationsModule } from './notifications/notifications.module';
     FilesModule,
     SkillsModule,
     RequestsModule,
+    CitiesModule,
     NotificationsModule,
   ],
   controllers: [AppController],

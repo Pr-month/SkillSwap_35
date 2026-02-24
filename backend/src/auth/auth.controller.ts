@@ -37,10 +37,7 @@ export class AuthController {
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  login(
-    @Body() dto: LoginAuthDto,
-    @Res({ passthrough: true }) res: Response,
-  ) {
+  login(@Body() dto: LoginAuthDto, @Res({ passthrough: true }) res: Response) {
     return this.authService.login(dto, res);
   }
 

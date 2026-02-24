@@ -7,7 +7,6 @@ export async function seedUsers(dataSource: DataSource) {
   const userRepository = dataSource.getRepository(User);
 
   for (const userData of UsersData) {
-
     const existingUser = await userRepository.findOne({
       where: { email: userData.email },
     });

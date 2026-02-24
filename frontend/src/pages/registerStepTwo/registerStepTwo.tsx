@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import styles from './registerStepTwo.module.css';
 import { TextInput } from '@/shared/ui/textInput/textInput';
 import { CustomDatePicker } from '@/widgets/datePicker/datePicker';
@@ -11,7 +11,6 @@ import { Controller, useForm } from 'react-hook-form';
 import { Button } from '@/shared/ui/button/button';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { russianCities } from '@/shared/lib/cities';
 import userIcon from '@/app/assets/static/images/background/user-info.svg';
 import {
   resetStepTwoData,
@@ -22,13 +21,23 @@ import { useDispatch, useSelector } from '@/services/store/store';
 import { RegistrationInfoPanel } from '@/shared/ui/registrationInfoPanel/registrationInfoPanel';
 import { stepActions } from '@/services/slices/stepSlice';
 import { getCategoriesSelector, getSubcategoriesByCategory } from '@/services/slices/skillsSlice';
+import { getCities, getCitiesSelector } from '@/services/slices/citiesSlice';
 
 export const RegisterStepTwo: FC = () => {
   const [isDatePickerOpen, setDatePicker] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+  // const [cities, setCities] = useState<Array<string>>([]);
+  const cities = useSelector(getCitiesSelector);
   const dispatch = useDispatch();
   const defaultValues = useSelector(state => state.register.stepTwoData);
   const genders = ['Мужской', 'Женский'] as const;
+
+  useEffect(() => {
+    if (cities.length === 0) {
+      dispatch(getCities());
+    }
+  }, []);
+
   const schema = yup.object({
     avatar: yup.string().required('Загрузите аватар'),
     name: yup
@@ -64,10 +73,7 @@ export const RegisterStepTwo: FC = () => {
         }
         return age >= 12 && age <= 100;
       }),
-    city: yup
-      .string()
-      .required('Укажите город')
-      .oneOf(russianCities, 'Выбранный город не существует'),
+    city: yup.string().required('Укажите город').oneOf(cities, 'Выбранный город не существует'),
     gender: yup.string().required('Укажите пол').oneOf(genders, 'Выберите пол'),
     categories: yup
       .array()
@@ -247,7 +253,7 @@ export const RegisterStepTwo: FC = () => {
               id="city"
               title="Город"
               placeholder="Не указан"
-              suggestions={russianCities}
+              suggestions={cities}
               error={errors.city?.message || ''}
               onFocus={() => clearErrors('city')}
             />

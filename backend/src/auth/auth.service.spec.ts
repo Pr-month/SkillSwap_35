@@ -104,7 +104,9 @@ describe('AuthService', () => {
     repo.create.mockReturnValue(makeUser({ password: 'hashed-password' }));
     repo.save
       .mockResolvedValueOnce(makeUser())
-      .mockResolvedValueOnce(makeUser({ refreshToken: 'hashed-refresh-token' }));
+      .mockResolvedValueOnce(
+        makeUser({ refreshToken: 'hashed-refresh-token' }),
+      );
 
     jest
       .spyOn(bcrypt, 'hash')
@@ -114,7 +116,10 @@ describe('AuthService', () => {
       .mockResolvedValueOnce('access-token')
       .mockResolvedValueOnce('refresh-token');
 
-    const result = await service.register(registerDto, res as unknown as Response);
+    const result = await service.register(
+      registerDto,
+      res as unknown as Response,
+    );
 
     expect(bcrypt.hash).toHaveBeenCalledWith(registerDto.password, 10);
     expect(repo.create).toHaveBeenCalledTimes(1);
@@ -144,7 +149,9 @@ describe('AuthService', () => {
     const user = makeUser({ email: loginDto.email });
 
     repo.findOne.mockResolvedValue(user);
-    repo.save.mockResolvedValue(makeUser({ refreshToken: 'hashed-refresh-token' }));
+    repo.save.mockResolvedValue(
+      makeUser({ refreshToken: 'hashed-refresh-token' }),
+    );
 
     jest.spyOn(bcrypt, 'compare').mockImplementation(async () => true);
     jest
@@ -160,7 +167,10 @@ describe('AuthService', () => {
       where: { email: loginDto.email },
       select: ['id', 'email', 'password', 'role', 'refreshToken'],
     });
-    expect(bcrypt.compare).toHaveBeenCalledWith(loginDto.password, user.password);
+    expect(bcrypt.compare).toHaveBeenCalledWith(
+      loginDto.password,
+      user.password,
+    );
     expect(jwtService.signAsync).toHaveBeenCalledTimes(2);
     expect(bcrypt.hash).toHaveBeenCalledWith('refresh-token', appCfg.hashSalt);
     expect(repo.save).toHaveBeenCalledWith(
@@ -189,7 +199,10 @@ describe('AuthService', () => {
 
   it('logout clears cookies', () => {
     const res = makeRes();
-    const result = service.logout({} as TAuthRequest, res as unknown as Response);
+    const result = service.logout(
+      {} as TAuthRequest,
+      res as unknown as Response,
+    );
 
     expect(res.clearCookie).toHaveBeenCalledWith('accessToken');
     expect(res.clearCookie).toHaveBeenCalledWith('refreshToken');

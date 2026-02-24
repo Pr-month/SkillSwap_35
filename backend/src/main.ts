@@ -10,6 +10,8 @@ import { appConfig, TAppConfig } from './config/app.config';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  app.setGlobalPrefix('api');
+  app.enableCors();
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,

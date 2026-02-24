@@ -8,7 +8,10 @@ import { In, Repository } from 'typeorm';
 import { AppModule } from '../src/app.module';
 import { User } from '../src/users/entities/user.entity';
 import { Skill } from '../src/skills/entities/skill.entity';
-import { Request as SkillRequest, RequestStatus } from '../src/requests/entities/request.entity';
+import {
+  Request as SkillRequest,
+  RequestStatus,
+} from '../src/requests/entities/request.entity';
 
 type RegisterPayload = {
   email: string;
@@ -74,7 +77,10 @@ describe('Requests (e2e)', () => {
     const agent = request.agent(app.getHttpServer());
     const email = makeEmail(prefix);
 
-    await agent.post('/auth/register').send(makeRegisterPayload(email)).expect(201);
+    await agent
+      .post('/auth/register')
+      .send(makeRegisterPayload(email))
+      .expect(201);
     createdEmails.add(email);
 
     const user = await usersRepository.findOne({ where: { email } });
@@ -95,7 +101,11 @@ describe('Requests (e2e)', () => {
     return response.body;
   };
 
-  const createRequestAs = async (sender: User, offeredSkill: Skill, requestedSkill: Skill) => {
+  const createRequestAs = async (
+    sender: User,
+    offeredSkill: Skill,
+    requestedSkill: Skill,
+  ) => {
     const payload: CreateRequestPayload = {
       requestedSkillId: requestedSkill.id,
       offeredSkillId: offeredSkill.id,
@@ -137,7 +147,9 @@ describe('Requests (e2e)', () => {
 
     usersRepository = app.get<Repository<User>>(getRepositoryToken(User));
     skillsRepository = app.get<Repository<Skill>>(getRepositoryToken(Skill));
-    requestsRepository = app.get<Repository<SkillRequest>>(getRepositoryToken(SkillRequest));
+    requestsRepository = app.get<Repository<SkillRequest>>(
+      getRepositoryToken(SkillRequest),
+    );
   });
 
   afterEach(async () => cleanup());
@@ -176,7 +188,11 @@ describe('Requests (e2e)', () => {
     const { user: receiver } = await registerUser('receiver2');
     const senderSkill = await createSkillAs(sender, 'sender2');
     const requestedSkill = await createSkillAs(receiver, 'receiver2');
-    const requestEntity = await createRequestAs(sender, senderSkill, requestedSkill);
+    const requestEntity = await createRequestAs(
+      sender,
+      senderSkill,
+      requestedSkill,
+    );
 
     // Incoming for receiver
     const incoming = await request(app.getHttpServer())
@@ -200,7 +216,11 @@ describe('Requests (e2e)', () => {
     const { user: receiver } = await registerUser('receiver3');
     const senderSkill = await createSkillAs(sender, 'sender3');
     const requestedSkill = await createSkillAs(receiver, 'receiver3');
-    const requestEntity = await createRequestAs(sender, senderSkill, requestedSkill);
+    const requestEntity = await createRequestAs(
+      sender,
+      senderSkill,
+      requestedSkill,
+    );
 
     await request(app.getHttpServer())
       .patch(`/requests/${requestEntity.id}`)
@@ -214,7 +234,11 @@ describe('Requests (e2e)', () => {
     const { user: receiver } = await registerUser('receiver4');
     const senderSkill = await createSkillAs(sender, 'sender4');
     const requestedSkill = await createSkillAs(receiver, 'receiver4');
-    const requestEntity = await createRequestAs(sender, senderSkill, requestedSkill);
+    const requestEntity = await createRequestAs(
+      sender,
+      senderSkill,
+      requestedSkill,
+    );
 
     const response = await request(app.getHttpServer())
       .patch(`/requests/${requestEntity.id}`)
@@ -231,7 +255,11 @@ describe('Requests (e2e)', () => {
     const { user: receiver } = await registerUser('receiver5');
     const senderSkill = await createSkillAs(sender, 'sender5');
     const requestedSkill = await createSkillAs(receiver, 'receiver5');
-    const requestEntity = await createRequestAs(sender, senderSkill, requestedSkill);
+    const requestEntity = await createRequestAs(
+      sender,
+      senderSkill,
+      requestedSkill,
+    );
 
     await request(app.getHttpServer())
       .delete(`/requests/${requestEntity.id}`)

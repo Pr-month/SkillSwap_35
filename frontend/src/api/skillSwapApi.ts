@@ -24,6 +24,23 @@ export const getSkillsApi = async () => {
   return assertSuccess(checkedRes, 'Не удалось получить навыки');
 };
 
+export type TSity = {
+  id: string;
+  name: string;
+};
+type SitiesResponse = Array<TSity>;
+
+export const getSitiesApi = async (search?: string, limit?: number) => {
+  const params = new URLSearchParams();
+  if (search) params.append('search', search);
+  if (limit) params.append('limit', String(limit));
+  const url = `${URL}/api/cities?${params.toString()}`;
+
+  const res = await fetch(url);
+  const result = await checkResponse<SitiesResponse>(res);
+  return result.map(el => el.name);
+};
+
 export const getUsersApi = async () => {
   const res = await fetch(`${URL}/api/users/all`);
   const checkedRes = await checkResponse<UsersResponse>(res);

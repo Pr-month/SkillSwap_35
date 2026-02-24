@@ -37,9 +37,9 @@ describe('FilesController', () => {
 
   it('should throw HttpException when file is not provided', () => {
     expect(() =>
-      controller.upload(undefined as unknown as Express.Multer.File)
+      controller.upload(undefined as unknown as Express.Multer.File),
     ).toThrowError(
-      new HttpException('File not provided', HttpStatus.BAD_REQUEST)
+      new HttpException('File not provided', HttpStatus.BAD_REQUEST),
     );
   });
 
@@ -79,9 +79,6 @@ describe('FilesController', () => {
 
     const mockCb2 = jest.fn();
     fileFilter(null, invalidFile, mockCb2);
-    expect(mockCb2).toHaveBeenCalledWith(
-      expect.any(HttpException),
-      false
-    );
+    expect(mockCb2).toHaveBeenCalledWith(expect.any(HttpException), false);
   });
 });

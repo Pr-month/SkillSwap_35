@@ -41,6 +41,7 @@
 
 .ul {
   box-sizing: border-box;
+  max-height: 192px;
   width: 100%;
   padding: 0;
   margin: 0;
@@ -50,6 +51,7 @@
   left: 0;
   background-color: var(--color-card);
   border-radius: 0 0 16px 16px;
+  overflow-y: scroll;
   border-top: transparent;
 }
 

@@ -159,7 +159,10 @@ describe('Auth (e2e)', () => {
     const password = 'Password123!';
     const agent = request.agent(app.getHttpServer());
 
-    await agent.post('/auth/register').send(makeRegisterPayload(email, password)).expect(201);
+    await agent
+      .post('/auth/register')
+      .send(makeRegisterPayload(email, password))
+      .expect(201);
     createdEmails.add(email);
 
     const response = await agent.post('/auth/logout').expect(201);
