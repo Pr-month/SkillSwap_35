@@ -15,6 +15,7 @@ import { RequestsModule } from './requests/requests.module';
 import { appConfig } from './config/app.config';
 import { dbConfig, TDBConfig } from './config/db.config';
 import { jwtConfig, TJwtConfig } from './config/jwt.config';
+import { NotificationsModule } from './notifications/notifications.module';
 
 @Module({
   imports: [
@@ -50,6 +51,7 @@ import { jwtConfig, TJwtConfig } from './config/jwt.config';
     FilesModule,
     SkillsModule,
     RequestsModule,
+    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
