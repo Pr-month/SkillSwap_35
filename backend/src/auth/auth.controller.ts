@@ -24,7 +24,7 @@ import { RegisterDto } from './dto/register.dto';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) { }
 
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
@@ -43,13 +43,21 @@ export class AuthController {
 
   @UseGuards(AccessTokenGuard)
   @Post('logout')
-  logout(@Res({ passthrough: true }) res: Response, @Req() req: TAuthRequest) {
+  @HttpCode(HttpStatus.OK)
+  logout(
+    @Res({ passthrough: true }) res: Response,
+    @Req() req: TAuthRequest,
+  ) {
     return this.authService.logout(req, res);
   }
 
   @UseGuards(RefreshTokenGuard)
   @Post('refresh')
-  refresh(@Res({ passthrough: true }) res: Response, @Req() req: TAuthRequest) {
+  @HttpCode(HttpStatus.OK)
+  refresh(
+    @Res({ passthrough: true }) res: Response,
+    @Req() req: TAuthRequest,
+  ) {
     return this.authService.refresh(req, res);
   }
 }

@@ -35,7 +35,7 @@ export class RegisterDto {
   gender: Gender;
 
   @IsString()
-  city: string;
+  city: number;
 
   @IsString()
   about: string;
