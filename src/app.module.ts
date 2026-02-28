@@ -7,7 +7,9 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { appConfig } from './config/app.config';
 import { dbConfig, TDBConfig } from './config/db.config';
+import { mailConfig } from './config/mail.config';
 import { FilesModule } from './files/files.module';
+import { MailModule } from './mail/mail.module';
 import { SkillsModule } from './skills/skills.module';
 import { UsersModule } from './users/users.module';
 
@@ -21,7 +23,7 @@ import { UsersModule } from './users/users.module';
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env.dev.example',
-      load: [appConfig, dbConfig],
+      load: [appConfig, dbConfig, mailConfig],
     }),
     TypeOrmModule.forRootAsync({
       inject: [dbConfig.KEY],
@@ -34,6 +36,7 @@ import { UsersModule } from './users/users.module';
     AuthModule,
     FilesModule,
     SkillsModule,
+    MailModule,
   ],
   controllers: [AppController],
   providers: [AppService],
