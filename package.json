@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "@nestjs/swagger": "^11.2.6",
+    "cookie-parser": "^1.4.7",
+    "swagger-ui-express": "^5.0.1"
+  }
+}

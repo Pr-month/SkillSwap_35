@@ -38,7 +38,7 @@ const jwtCfg = {
 
 describe('AuthService', () => {
   let service: AuthService;
-  let repo: { create: jest.Mock; save: jest.Mock; findOne: jest.Mock };
+  let repo: { create: jest.Mock; save: jest.Mock; findOne: jest.Mock, update: jest.Mock; };
   let jwtService: { signAsync: jest.Mock };
 
   const makeUser = (patch: Partial<User> = {}): User =>
@@ -77,7 +77,7 @@ describe('AuthService', () => {
   };
 
   beforeEach(async () => {
-    repo = { create: jest.fn(), save: jest.fn(), findOne: jest.fn() };
+    repo = { create: jest.fn(), save: jest.fn(), findOne: jest.fn(), update: jest.fn() };
     jwtService = { signAsync: jest.fn() };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -197,9 +197,9 @@ describe('AuthService', () => {
     );
   });
 
-  it('logout clears cookies', () => {
+  it('logout clears cookies', async () => {
     const res = makeRes();
-    const result = service.logout(
+    const result = await service.logout(
       {} as TAuthRequest,
       res as unknown as Response,
     );
@@ -219,9 +219,17 @@ describe('AuthService', () => {
       .mockResolvedValueOnce('new-access-token')
       .mockResolvedValueOnce('new-refresh-token');
 
+    jest
+      .spyOn(bcrypt, 'hash')
+      .mockImplementationOnce(async () => 'hashed-refresh-token');
+
+    repo.update.mockResolvedValue({ affected: 1 });
+
     const result = await service.refresh(req, res as unknown as Response);
 
     expect(jwtService.signAsync).toHaveBeenCalledTimes(2);
+    expect(bcrypt.hash).toHaveBeenCalledWith('new-refresh-token', appCfg.hashSalt);
+    expect(repo.update).toHaveBeenCalledWith('user-id', {refreshToken: 'hashed-refresh-token',});
     expectCookies(res, 'new-access-token', 'new-refresh-token');
     expect(result).toEqual({ message: 'Tokens refresh' });
   });

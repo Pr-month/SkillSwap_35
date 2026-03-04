@@ -77,7 +77,7 @@ export const UserCard: React.FC<UserCardProps> = ({
             {learnSkill &&
               learnSkill.map(skill => (
                 <Skill type={skill.category} key={skill.customSkillId}>
-                  {skill.name}
+                  {skill.category}
                 </Skill>
               ))}
             {wantsToLearn.length > 2 && (
