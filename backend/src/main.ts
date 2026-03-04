@@ -7,6 +7,7 @@ import { MulterExceptionFilter } from './common/filters/multer-exception.filter'
 import { AllExceptionFilter } from './common/filters/all-exception.filter';
 import { AppModule } from './app.module';
 import { appConfig, TAppConfig } from './config/app.config';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -25,6 +26,18 @@ async function bootstrap() {
   app.use(cookieParser());
   app.useStaticAssets(join(__dirname, '..', 'public'));
   app.useGlobalFilters(new MulterExceptionFilter(), new AllExceptionFilter());
+
+  const config = new DocumentBuilder()
+    .setTitle('SkillSwap API')
+    .setDescription('Документация API проекта SkillSwap')
+    .setVersion('1.0')
+    .addBearerAuth()
+    .build();
+
+  const document = SwaggerModule.createDocument(app, config);
+
+  SwaggerModule.setup('docs', app, document);
+
   const appConfigData = app.get<TAppConfig>(appConfig.KEY);
   await app.listen(appConfigData.port);
 }
