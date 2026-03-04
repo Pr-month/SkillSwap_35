@@ -17,6 +17,8 @@ import { dbConfig, TDBConfig } from './config/db.config';
 import { jwtConfig, TJwtConfig } from './config/jwt.config';
 import { CitiesModule } from './cities/cities.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { MailModule } from './mail/mail.module';
+import { mailConfig } from './config/mail.config';
 
 @Module({
   imports: [
@@ -24,7 +26,7 @@ import { NotificationsModule } from './notifications/notifications.module';
       isGlobal: true,
       envFilePath:
         process.env.NODE_ENV === 'test' ? '.env.test.local' : '.env.local',
-      load: [appConfig, dbConfig, jwtConfig],
+      load: [appConfig, dbConfig, jwtConfig, mailConfig],
     }),
     JwtModule.registerAsync({
       global: true,
@@ -52,6 +54,7 @@ import { NotificationsModule } from './notifications/notifications.module';
     RequestsModule,
     CitiesModule,
     NotificationsModule,
+    MailModule,
   ],
   controllers: [AppController],
   providers: [AppService],
